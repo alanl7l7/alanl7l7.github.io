@@ -3,99 +3,348 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site In Progress</title>
+    <title>Alan // Insert Coin</title>
     <style>
-        /* 1. The Arcade Background */
+        /* Base Environment */
         body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #0d0d0d; /* Deep charcoal arcade black */
+            margin: 0; padding: 0;
+            background-color: #0d0d0d;
+            color: #33ff33;
+            font-family: 'Courier New', Courier, monospace;
+            height: 100vh;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
-            font-family: 'Courier New', Courier, monospace;
         }
 
-        /* 2. The Loading Container */
-        .loading-container {
-            text-align: center;
+        /* -----------------------------------
+           THE BOOT SCREEN (FAKE LOADING)
+        ------------------------------------ */
+        #boot-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #0d0d0d;
+            z-index: 20; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 50px;
+            box-sizing: border-box;
+            transition: opacity 0.5s ease-out;
+        }
+
+        #boot-text {
+            font-size: 1.2rem;
+            line-height: 1.5;
+            white-space: pre-wrap; 
+        }
+
+        #boot-loader {
+            display: none; 
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #ffcc00;
+        }
+
+        /* -----------------------------------
+           MAIN OS UI 
+        ------------------------------------ */
+        .terminal-container {
+            width: 95vw; height: 90vh;
+            border: 4px solid #33ff33;
+            display: grid;
+            grid-template-rows: 50px 1fr 40px;
+            grid-template-columns: 250px 1fr;
             position: relative;
             z-index: 5;
+            box-shadow: 0 0 15px #005500 inset;
+            opacity: 0; 
+            transition: opacity 0.5s ease-in;
         }
 
-        /* 3. The Big Text */
-        .pixel-text {
-            color: #ff0055; /* Arcade Pink/Red for urgency */
-            font-size: clamp(2rem, 8vw, 5rem); /* Responsive size */
+        .hud-header {
+            grid-column: 1 / -1;
+            border-bottom: 4px solid #33ff33;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
             font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            margin-bottom: 30px;
-            text-shadow: 4px 4px 0px #550022;
-            animation: glitch 1s steps(2) infinite;
+            background: #002200;
         }
 
-        /* 4. The Infinite Loading Bar */
-        .loading-bar-border {
-            border: 4px solid #ff0055;
-            width: 280px;
-            height: 20px;
-            margin: 0 auto;
-            padding: 4px;
-            position: relative;
-            overflow: hidden;
+        .exp-bar { color: #ffcc00; }
+
+        .sidebar {
+            border-right: 4px solid #33ff33;
+            padding: 20px; display: flex;
+            flex-direction: column; gap: 15px;
+            background: #050505;
         }
 
-        .loading-bar-fill {
-            background-color: #ff0055;
-            height: 100%;
-            width: 40%;
-            position: absolute;
-            left: -50%;
-            /* Never-ending looping animation */
-            animation: infiniteScroll 2s linear infinite;
+        .nav-btn {
+            background: none; border: 2px solid transparent;
+            color: #33ff33; font-family: inherit; font-size: 1.2rem;
+            text-align: left; padding: 10px; cursor: pointer;
+            text-transform: uppercase; transition: 0.1s;
         }
 
-        /* 5. Animations */
-        @keyframes glitch {
-            0% { transform: translate(0); opacity: 1; }
-            50% { transform: translate(3px, -2px); opacity: 0.8; }
-            100% { transform: translate(-3px, 2px); opacity: 1; }
+        .nav-btn:hover {
+            color: #ffcc00; border-left: 2px solid #ffcc00; padding-left: 15px;
         }
 
-        @keyframes infiniteScroll {
-            0% { left: -50%; }
-            100% { left: 110%; }
+        .nav-btn.active {
+            background-color: #33ff33; color: #0d0d0d; border: 2px solid #33ff33;
         }
 
-        /* CRT Scanline Overlay */
+        .main-screen {
+            padding: 30px; overflow-y: auto; position: relative;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active {
+            display: block; animation: scanIn 0.3s ease-out;
+        }
+
+        @keyframes scanIn {
+            0% { opacity: 0; transform: translateY(10px); filter: blur(2px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        .mission-card {
+            border: 2px dashed #ff0055; padding: 15px; margin-bottom: 20px;
+            background: rgba(255, 0, 85, 0.05);
+        }
+        
+        .mission-card:hover { border-style: solid; background: rgba(255, 0, 85, 0.1); }
+
+        .mission-title {
+            color: #ff0055; font-size: 1.5rem; margin: 0 0 10px 0;
+            text-shadow: 2px 2px 0px #550022; display: flex; justify-content: space-between;
+        }
+
+        .rank { color: #ffcc00; font-size: 1.2rem; }
+
+        .skill-row {
+            display: flex; justify-content: space-between; margin-bottom: 10px;
+            font-size: 1.2rem; border-bottom: 1px dotted #005500; padding-bottom: 5px;
+        }
+
+        .inventory-item {
+            color: #33ff33; text-decoration: none; display: block;
+            margin-bottom: 15px; font-size: 1.2rem;
+        }
+        .inventory-item:hover { color: #fff; background: #33ff33; padding-left: 10px; }
+
+        .hud-footer {
+            grid-column: 1 / -1; border-top: 4px solid #33ff33;
+            padding: 0 20px; display: flex; align-items: center;
+            font-size: 0.9rem; background: #002200;
+        }
+
+        .blinking-cursor {
+            display: inline-block; width: 10px; height: 1.2em;
+            background-color: #33ff33; margin-left: 5px; vertical-align: text-bottom;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* The CRT Overlay */
         .crt-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 3px, 2px 100%;
-            pointer-events: none;
-            z-index: 10;
+                         linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.03), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none; z-index: 9999;
         }
+
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #0d0d0d; border-left: 2px solid #33ff33; }
+        ::-webkit-scrollbar-thumb { background: #33ff33; }
     </style>
 </head>
 <body>
 
     <div class="crt-overlay"></div>
 
-    <div class="loading-container">
-        <div class="pixel-text">Site In Progress</div>
-        <div class="loading-bar-border">
-            <div class="loading-bar-fill"></div>
+    <!-- 1. FAKE BOOT SCREEN -->
+    <div id="boot-screen">
+        <div id="boot-text"></div>
+        <div id="boot-loader">
+            BREWING COFFEE: <span id="boot-bar">[░░░░░░░░░░░░░░░░░░░░]</span> <span id="boot-percent">0%</span>
         </div>
     </div>
 
+    <!-- 2. MAIN PORTFOLIO UI -->
+    <div class="terminal-container" id="main-os">
+        <div class="hud-header">
+            <span>CAFFEINE: 100% | STRESS: 12%</span>
+            <span>PLAYER: ALAN</span>
+            <span class="exp-bar">LVL: 26 [███████░░░] 74%</span>
+        </div>
+
+        <div class="sidebar">
+            <button class="nav-btn active" onclick="switchTab('about_me', this)">> ABOUT_ME</button>
+            <button class="nav-btn" onclick="switchTab('projects', this)">> PROJECTS</button>
+            <button class="nav-btn" onclick="switchTab('skill_tree', this)">> SKILL_TREE</button>
+            <button class="nav-btn" onclick="switchTab('inventory', this)">> INVENTORY</button>
+        </div>
+
+        <div class="main-screen">
+            <!-- Tab 1 -->
+            <div id="about_me" class="tab-content active">
+                <h2>>>> HELLO, WORLD.</h2>
+                <p><strong>ROLE:</strong> Solution Architect / Code Janitor / Full-Stack Mage</p>
+                <p><strong>LOCATION:</strong> Earth (Mostly)</p>
+                <br>
+                <p><strong>BIO:</strong></p>
+                <p>I build solution first, then worry about pretty code later. I experiment with all kind of stuff to get it done, and argue with my agents most of the time.</p>
+                <p>> Status: Ready to write some code. Or at least copy-paste it from StackOverflow. jk its mostly gemini now</p>
+            </div>
+
+            <!-- Tab 2 -->
+            <div id="projects" class="tab-content">
+                <h2>>>> RECENT WORK</h2>
+                <div class="mission-card">
+                    <h3 class="mission-title">TenderVise <span class="rank">EXP: 1500</span></h3>
+                    <p>STACK:[ React, Python, Supabase ]</p>
+                    <p>> Mostly frontend then connecting to the database and gemini API.</p>
+                </div>
+                <div class="mission-card">
+                    <h3 class="mission-title">Kenyalang <span class="rank">EXP: 1999</span></h3>
+                    <p>STACK:[ Python, Agentic Frameworks ]</p>
+                    <p>> Processing OCR data. Data everything then RAG.</p>
+                </div>
+            </div>
+
+            <!-- Tab 3 -->
+            <div id="skill_tree" class="tab-content">
+                <h2>>>> TECH STACK STATS</h2>
+                <br>
+                <div class="skill-row"><span>> Python</span> <span class="exp-bar">[█████████░] LVL 9</span></div>
+                <div class="skill-row"><span>> React.js</span> <span class="exp-bar">[████████░░] LVL 8</span></div>
+                <div class="skill-row"><span>> Googling Errors</span> <span class="exp-bar">[██████████] MAX</span></div>
+            </div>
+
+            <!-- Tab 4 -->
+            <div id="inventory" class="tab-content">
+                <h2>>>> SOCIAL LINKS</h2>
+                <br>
+                <a href="my email to be updated" class="inventory-item">> [ EQUIP: Email ] - Send a message</a>
+                <a href="#" class="inventory-item">> [ EQUIP: GitHub ] - Look at my commits</a>
+            </div>
+        </div>
+
+        <div class="hud-footer">
+            <span id="cmd-text">> Playing loading animation... Done.</span><div class="blinking-cursor"></div>
+        </div>
+    </div>
+        
+        // -----------------------------------------------
+    <!-- 3. JAVASCRIPT LOGIC -->
+    <script>
+        // --- ADD THIS BLOCK: 8-Bit Audio Synthesizer ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function play8BitClick() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'square'; // 'square' = classic Nintendo/Arcade sound
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime); // High pitch blip
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05); // Quick drop
+            
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime); // 10% volume (so it isn't deafening)
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05); // Fast fade out
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05); // Lasts exactly 50 milliseconds
+        }
+        // -----------------------------------------------
+        function switchTab(tabId, element) {
+            play8BitClick();
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+            document.getElementById('cmd-text').innerText = `> Viewing ${tabId.replace('_', ' ')}...`;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const bootScreen = document.getElementById('boot-screen');
+            const mainOs = document.getElementById('main-os');
+            const bootText = document.getElementById('boot-text');
+            const bootLoader = document.getElementById('boot-loader');
+            const bootBar = document.getElementById('boot-bar');
+            const bootPercent = document.getElementById('boot-percent');
+
+            // Skip if already loaded this session
+            if (sessionStorage.getItem('alan_portfolio_booted') === 'true') {
+                bootScreen.style.display = 'none';
+                mainOs.style.opacity = '1';
+                return;
+            }
+
+            // COMEDIC LOADING TEXT
+            const bootLines =[
+                "ALAN_PORTFOLIO.EXE [Version: Still fixing bugs]",
+                "(c) Alan. Please don't check my console log.\n",
+                "> Waking up the server... (yawn) OK",
+                "> Fetching resume from under the bed... OK",
+                "> Centering the main <div>... FAILED... again",
+                "> Forcing <div> to center via brute force... OK",
+                "> Catching stray bugs with a net...",
+                "> Convincing CSS to behave today...",
+                "> Translating caffeine into code... DONE\n"
+            ];
+
+            let lineIndex = 0;
+
+            function printLine() {
+                if (lineIndex < bootLines.length) {
+                    bootText.innerHTML += bootLines[lineIndex] + "<br>";
+                    lineIndex++;
+                    setTimeout(printLine, Math.random() * 200 + 50); 
+                } else {
+                    bootLoader.style.display = 'block';
+                    fillBar();
+                }
+            }
+
+            let percent = 0;
+            const totalBlocks = 20;
+
+            function fillBar() {
+                if (percent <= 100) {
+                    let blocksFilled = Math.floor((percent / 100) * totalBlocks);
+                    let barString = "█".repeat(blocksFilled) + "░".repeat(totalBlocks - blocksFilled);
+                    
+                    bootBar.innerText = `[${barString}]`;
+                    bootPercent.innerText = `${percent}%`;
+                    
+                    percent += Math.floor(Math.random() * 12) + 2; 
+                    setTimeout(fillBar, Math.random() * 100 + 30);
+                } else {
+                    bootText.innerHTML += "<br><span style='color:#33ff33; font-weight:bold;'>> LOOKS GOOD. HOPEFULLY NOTHING EXPLODES.</span>";
+                    bootLoader.style.color = "#33ff33";
+                    
+                    sessionStorage.setItem('alan_portfolio_booted', 'true');
+
+                    setTimeout(() => {
+                        bootScreen.style.opacity = '0';
+                        mainOs.style.opacity = '1';
+                        setTimeout(() => bootScreen.style.display = 'none', 500); 
+                    }, 1200); // Wait a tiny bit longer so they can read the joke at the end
+                }
+            }
+
+            setTimeout(printLine, 500);
+        });
+    </script>
 </body>
 </html>
