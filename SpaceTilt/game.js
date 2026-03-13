@@ -19,6 +19,12 @@ let usingTouchControls = false;
 let orientationSamples = 0;
 let orientationFallbackTimer = null;
 let hasStartedPermissionFlow = false;
+let player;
+let asteroids = [];
+let stars = [];
+let frames = 0;
+let asteroidSpawnRate = 60; // Spawn an asteroid every X frames
+let baseAsteroidSpeed = 4;
 
 // Resize canvas to fill screen
 function resize() {
@@ -131,15 +137,6 @@ class Star {
         ctx.fillRect(this.x, this.y, this.size, this.size);
     }
 }
-
-// --- Game State ---
-
-let player;
-let asteroids = [];
-let stars = [];
-let frames = 0;
-let asteroidSpawnRate = 60; // Spawn an asteroid every X frames
-let baseAsteroidSpeed = 4;
 
 function init() {
     player = new Player();
