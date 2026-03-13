@@ -378,9 +378,12 @@ function requestAccessAndStart() {
 
     hasStartedPermissionFlow = true;
 
+    if (!isPlaying) {
+        startGame();
+    }
+
     if (!window.isSecureContext) {
         enableTouchControls('Motion sensors are blocked here. Drag left or right to move. For tilt controls, open the game over HTTPS or localhost.');
-        startGame();
         hasStartedPermissionFlow = false;
         return;
     }
@@ -394,8 +397,6 @@ function requestAccessAndStart() {
             } else {
                 enableTouchControls('This browser is not exposing tilt data. Drag left or right to move.');
             }
-
-            startGame();
         })
         .catch(() => {
             if (supportsOrientationEvents()) {
@@ -403,8 +404,6 @@ function requestAccessAndStart() {
             } else {
                 enableTouchControls('This browser is not exposing tilt data. Drag left or right to move.');
             }
-
-            startGame();
         })
         .finally(() => {
             hasStartedPermissionFlow = false;
@@ -423,6 +422,10 @@ function startGame() {
 
 startBtn.addEventListener('click', requestAccessAndStart);
 restartBtn.addEventListener('click', startGame);
+startBtn.addEventListener('pointerup', requestAccessAndStart);
+restartBtn.addEventListener('pointerup', startGame);
+startBtn.addEventListener('touchend', requestAccessAndStart, { passive: true });
+restartBtn.addEventListener('touchend', startGame, { passive: true });
 window.addEventListener('pointerdown', handlePointerDown, { passive: true });
 window.addEventListener('pointermove', handlePointerMove, { passive: true });
 window.addEventListener('touchstart', handleTouchStart, { passive: false });
