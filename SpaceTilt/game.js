@@ -9,6 +9,9 @@ const startBtn = document.getElementById('start-btn');
 const restartBtn = document.getElementById('restart-btn');
 const controlStatusEl = document.getElementById('control-status');
 
+// Reuse the same lightweight 8-bit synth approach used in the main menu.
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
 let width, height;
 let animationId;
 let isPlaying = false;
@@ -25,6 +28,48 @@ let stars = [];
 let frames = 0;
 let asteroidSpawnRate = 60; // Spawn an asteroid every X frames
 let baseAsteroidSpeed = 4;
+
+function unlockAudio() {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+    }
+}
+
+function play8BitScore() {
+    unlockAudio();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(420, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(780, audioCtx.currentTime + 0.06);
+
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.07);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.07);
+}
+
+function play8BitCrash() {
+    unlockAudio();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(260, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(70, audioCtx.currentTime + 0.14);
+
+    gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.16);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.16);
+}
 
 // Resize canvas to fill screen
 function resize() {
@@ -265,6 +310,7 @@ function update() {
 
         // Check Collision
         if (checkCollision(player, a)) {
+            play8BitCrash();
             gameOver();
             return; // Stop updating this frame
         }
@@ -274,6 +320,7 @@ function update() {
             asteroids.splice(i, 1);
             score++;
             scoreEl.innerText = score;
+            play8BitScore();
         }
     }
 
@@ -369,6 +416,8 @@ function handleTouchMove(event) {
 }
 
 function requestAccessAndStart() {
+    unlockAudio();
+
     if (hasStartedPermissionFlow) {
         return;
     }
@@ -408,6 +457,7 @@ function requestAccessAndStart() {
 }
 
 function startGame() {
+    unlockAudio();
     startScreen.classList.add('hidden');
     gameOverScreen.classList.add('hidden');
     init();
