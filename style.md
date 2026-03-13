@@ -1,5 +1,26 @@
 # Portfolio Style Guide
 
+## File structure
+alanl7l7.github.io/
+│
+├── index.html               <-- Your main website (Main Menu / "Choose a Game")
+├── style.css                <-- Main website styling
+│
+├── brick-breaker/
+│   ├── index.html           <-- Brick Breaker HTML
+│   ├── game.js              <-- Brick Breaker Logic
+│   └── style.css            
+│
+├── space-invaders/
+│   ├── index.html           <-- Space Invaders HTML
+│   ├── game.js              <-- Space Invaders Logic
+│   └── style.css            
+│
+└── endless-runner/
+    ├── index.html           <-- Endless Runner HTML
+    ├── game.js              <-- Endless Runner Logic
+    └── style.css
+
 ## Purpose
 
 Keep all future work aligned with the existing retro terminal / arcade UI already established in the portfolio.
