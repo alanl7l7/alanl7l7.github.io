@@ -18,6 +18,7 @@ let hasOrientationListener = false;
 let usingTouchControls = false;
 let orientationSamples = 0;
 let orientationFallbackTimer = null;
+let hasStartedPermissionFlow = false;
 
 // Resize canvas to fill screen
 function resize() {
@@ -175,9 +176,41 @@ function beginOrientationWatchdog() {
     clearOrientationFallbackTimer();
     orientationFallbackTimer = setTimeout(() => {
         if (orientationSamples === 0) {
-            enableTouchControls('No motion sensor data detected. Drag left or right to move. For tilt controls, open over HTTPS or localhost.');
+            enableTouchControls('No motion sensor data detected. Drag left or right to move. On iPhone, make sure the site is opened over HTTPS and motion access is allowed.');
         }
     }, 1500);
+}
+
+function supportsOrientationEvents() {
+    return 'DeviceOrientationEvent' in window || 'ondeviceorientation' in window;
+}
+
+async function requestSensorPermissionIfNeeded(sensorType) {
+    if (typeof sensorType === 'undefined' || typeof sensorType.requestPermission !== 'function') {
+        return 'granted';
+    }
+
+    return sensorType.requestPermission();
+}
+
+async function requestSensorPermissions() {
+    const results = await Promise.allSettled([
+        requestSensorPermissionIfNeeded(window.DeviceOrientationEvent),
+        requestSensorPermissionIfNeeded(window.DeviceMotionEvent)
+    ]);
+
+    const denied = results.some((result) => result.status === 'fulfilled' && result.value === 'denied');
+    const granted = results.some((result) => result.status === 'fulfilled' && result.value === 'granted');
+
+    if (denied && !granted) {
+        return 'denied';
+    }
+
+    if (granted) {
+        return 'granted';
+    }
+
+    return 'granted';
 }
 
 // --- Collision Detection ---
@@ -284,6 +317,7 @@ function handleOrientation(event) {
 function enableOrientationControls() {
     if (!hasOrientationListener) {
         window.addEventListener('deviceorientation', handleOrientation);
+        window.addEventListener('deviceorientationabsolute', handleOrientation);
         hasOrientationListener = true;
     }
     orientationSamples = 0;
@@ -338,36 +372,43 @@ function handleTouchMove(event) {
 }
 
 function requestAccessAndStart() {
-    if (!window.isSecureContext) {
-        enableTouchControls('Motion sensors are blocked here. Drag left or right to move. For tilt controls, open the game over HTTPS or localhost.');
-        startGame();
+    if (hasStartedPermissionFlow) {
         return;
     }
 
-    // Check if DeviceOrientationEvent is supported and requires permission (iOS 13+)
-    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission()
-            .then(permissionState => {
-                if (permissionState === 'granted') {
-                    enableOrientationControls();
-                    startGame();
-                } else {
-                    enableTouchControls();
-                    startGame();
-                }
-            })
-            .catch(() => {
-                enableTouchControls();
-                startGame();
-            });
-    } else {
-        if ('DeviceOrientationEvent' in window) {
-            enableOrientationControls();
-        } else {
-            enableTouchControls();
-        }
+    hasStartedPermissionFlow = true;
+
+    if (!window.isSecureContext) {
+        enableTouchControls('Motion sensors are blocked here. Drag left or right to move. For tilt controls, open the game over HTTPS or localhost.');
         startGame();
+        hasStartedPermissionFlow = false;
+        return;
     }
+
+    requestSensorPermissions()
+        .then((permissionState) => {
+            if (permissionState === 'granted' && supportsOrientationEvents()) {
+                enableOrientationControls();
+            } else if (supportsOrientationEvents()) {
+                enableTouchControls('Motion access was denied. Drag left or right to move.');
+            } else {
+                enableTouchControls('This browser is not exposing tilt data. Drag left or right to move.');
+            }
+
+            startGame();
+        })
+        .catch(() => {
+            if (supportsOrientationEvents()) {
+                enableTouchControls('Sensor permission failed. Drag left or right to move.');
+            } else {
+                enableTouchControls('This browser is not exposing tilt data. Drag left or right to move.');
+            }
+
+            startGame();
+        })
+        .finally(() => {
+            hasStartedPermissionFlow = false;
+        });
 }
 
 function startGame() {
@@ -391,7 +432,7 @@ window.addEventListener('touchmove', handleTouchMove, { passive: false });
 ctx.fillStyle = '#000';
 ctx.fillRect(0, 0, width, height);
 
-if ('DeviceOrientationEvent' in window) {
+if (supportsOrientationEvents()) {
     if (window.isSecureContext) {
         setControlStatus('Tilt available. Tap start to check the motion sensor.');
     } else {
