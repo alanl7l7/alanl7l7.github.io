@@ -16,6 +16,8 @@ let score = 0;
 let tilt = 0; // Gamma value from device orientation
 let hasOrientationListener = false;
 let usingTouchControls = false;
+let orientationSamples = 0;
+let orientationFallbackTimer = null;
 
 // Resize canvas to fill screen
 function resize() {
@@ -145,6 +147,7 @@ function init() {
     frames = 0;
     asteroidSpawnRate = 60;
     baseAsteroidSpeed = 4;
+    tilt = 0;
     scoreEl.innerText = score;
     
     // Initialize starfield if empty
@@ -159,6 +162,22 @@ function setControlStatus(message) {
     if (controlStatusEl) {
         controlStatusEl.innerText = message;
     }
+}
+
+function clearOrientationFallbackTimer() {
+    if (orientationFallbackTimer) {
+        clearTimeout(orientationFallbackTimer);
+        orientationFallbackTimer = null;
+    }
+}
+
+function beginOrientationWatchdog() {
+    clearOrientationFallbackTimer();
+    orientationFallbackTimer = setTimeout(() => {
+        if (orientationSamples === 0) {
+            enableTouchControls('No motion sensor data detected. Drag left or right to move. For tilt controls, open over HTTPS or localhost.');
+        }
+    }, 1500);
 }
 
 // --- Collision Detection ---
@@ -251,7 +270,14 @@ function handleOrientation(event) {
     // Handle edge cases (e.g., device is upside down or flat)
     if (gamma > 90) gamma = 90;
     if (gamma < -90) gamma = -90;
-    
+
+    orientationSamples += 1;
+    clearOrientationFallbackTimer();
+
+    if (!usingTouchControls) {
+        setControlStatus('Tilt controls online. Tilt your device to steer.');
+    }
+
     tilt = gamma;
 }
 
@@ -260,13 +286,16 @@ function enableOrientationControls() {
         window.addEventListener('deviceorientation', handleOrientation);
         hasOrientationListener = true;
     }
+    orientationSamples = 0;
     usingTouchControls = false;
-    setControlStatus('Tilt controls online. Drag still works as backup.');
+    setControlStatus('Checking motion sensor...');
+    beginOrientationWatchdog();
 }
 
-function enableTouchControls() {
+function enableTouchControls(statusMessage = 'Touch steering active. Drag left or right to move.') {
+    clearOrientationFallbackTimer();
     usingTouchControls = true;
-    setControlStatus('Touch steering active. Drag left or right to move.');
+    setControlStatus(statusMessage);
 }
 
 function updateTouchTilt(clientX) {
@@ -290,7 +319,31 @@ function handlePointerDown(event) {
     updateTouchTilt(event.clientX);
 }
 
+function handleTouchStart(event) {
+    if (!usingTouchControls || event.touches.length === 0) {
+        return;
+    }
+
+    event.preventDefault();
+    updateTouchTilt(event.touches[0].clientX);
+}
+
+function handleTouchMove(event) {
+    if (!usingTouchControls || !isPlaying || event.touches.length === 0) {
+        return;
+    }
+
+    event.preventDefault();
+    updateTouchTilt(event.touches[0].clientX);
+}
+
 function requestAccessAndStart() {
+    if (!window.isSecureContext) {
+        enableTouchControls('Motion sensors are blocked here. Drag left or right to move. For tilt controls, open the game over HTTPS or localhost.');
+        startGame();
+        return;
+    }
+
     // Check if DeviceOrientationEvent is supported and requires permission (iOS 13+)
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission()
@@ -331,13 +384,19 @@ startBtn.addEventListener('click', requestAccessAndStart);
 restartBtn.addEventListener('click', startGame);
 window.addEventListener('pointerdown', handlePointerDown, { passive: true });
 window.addEventListener('pointermove', handlePointerMove, { passive: true });
+window.addEventListener('touchstart', handleTouchStart, { passive: false });
+window.addEventListener('touchmove', handleTouchMove, { passive: false });
 
 // Draw initial background before game starts
 ctx.fillStyle = '#000';
 ctx.fillRect(0, 0, width, height);
 
 if ('DeviceOrientationEvent' in window) {
-    setControlStatus('Tilt controls available. If permission fails, touch steering will take over.');
+    if (window.isSecureContext) {
+        setControlStatus('Tilt available. Tap start to check the motion sensor.');
+    } else {
+        enableTouchControls('Motion sensors are unavailable here. Drag left or right to move. For tilt controls, open the game over HTTPS or localhost.');
+    }
 } else {
-    enableTouchControls();
+    enableTouchControls('This device has no motion sensor support. Drag left or right to move.');
 }
