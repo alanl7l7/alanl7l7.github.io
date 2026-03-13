@@ -1,0 +1,130 @@
+:root {
+  --bg: #050505;
+  --green: #39ff14; /* Phosphor green */
+  --amber: #ffb000;
+  --red: #ff3333;
+  --white: #eeeeee;
+  --font-main: 'Courier New', Courier, monospace;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--green);
+  font-family: var(--font-main);
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* CRT Scanlines Effect */
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 100;
+}
+
+#game-container {
+  position: relative;
+  border: 2px solid var(--green);
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.2), inset 0 0 15px rgba(57, 255, 20, 0.1);
+  background-color: #000;
+}
+
+canvas {
+  display: block;
+}
+
+#hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 20px;
+  box-sizing: border-box;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-shadow: 0 0 5px var(--green);
+  pointer-events: none;
+}
+
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(5, 5, 5, 0.85);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  z-index: 10;
+}
+
+.screen.active {
+  display: flex;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px var(--green);
+  letter-spacing: 2px;
+}
+
+p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  opacity: 0.8;
+}
+
+button {
+  background: transparent;
+  color: var(--green);
+  border: 2px solid var(--green);
+  padding: 12px 24px;
+  font-family: var(--font-main);
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+  box-shadow: 0 0 5px rgba(57, 255, 20, 0.3);
+}
+
+button:hover {
+  background: var(--green);
+  color: var(--bg);
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.6);
+}
+
+.warning {
+  color: var(--red);
+  text-shadow: 0 0 10px var(--red);
+}
+
+#game-over-screen button {
+  color: var(--red);
+  border-color: var(--red);
+  box-shadow: 0 0 5px rgba(255, 51, 51, 0.3);
+}
+
+#game-over-screen button:hover {
+  background: var(--red);
+  color: var(--bg);
+  box-shadow: 0 0 15px rgba(255, 51, 51, 0.6);
+}

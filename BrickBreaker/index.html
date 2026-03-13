@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BRICK BREAKER // TERMINAL</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="crt-overlay"></div>
+  <div id="game-container">
+    <div id="hud">
+      <div class="hud-item">SCORE: <span id="score">0</span></div>
+      <div class="hud-item">LIVES: <span id="lives">3</span></div>
+    </div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    
+    <!-- Overlays -->
+    <div id="start-screen" class="screen active">
+      <h1>SYSTEM BOOT...</h1>
+      <p>MISSION: DESTROY ALL BLOCKS</p>
+      <button id="start-btn">INITIALIZE</button>
+    </div>
+    
+    <div id="game-over-screen" class="screen">
+      <h1 class="warning">CRITICAL FAILURE</h1>
+      <p>SYSTEM HALTED</p>
+      <button id="restart-btn">REBOOT</button>
+    </div>
+    
+    <div id="win-screen" class="screen">
+      <h1>MISSION ACCOMPLISHED</h1>
+      <p>ALL THREATS ELIMINATED</p>
+      <button id="play-again-btn">NEW MISSION</button>
+    </div>
+  </div>
+  <script src="./game.js"></script>
+</body>
+</html>
+
