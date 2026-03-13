@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ENDLESS RUNNER // TERMINAL</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="crt-overlay"></div>
+  <div id="game-container">
+    <div id="hud">
+      <div class="hud-item">HI-SCORE: <span id="high-score">0</span></div>
+      <div class="hud-item">SCORE: <span id="score">0</span></div>
+    </div>
+    <!-- Wide rectangle for endless runner -->
+    <canvas id="gameCanvas" width="800" height="300"></canvas>
+    
+    <!-- Overlays -->
+    <div id="start-screen" class="screen active">
+      <h1>SYSTEM BOOT...</h1>
+      <p>MISSION: EVADE OBSTACLES</p>
+      <p class="blink">[PRESS SPACE TO INITIALIZE]</p>
+    </div>
+    
+    <div id="game-over-screen" class="screen">
+      <h1 class="warning">CRITICAL FAILURE</h1>
+      <p>COLLISION DETECTED</p>
+      <p class="blink">[PRESS SPACE TO REBOOT]</p>
+    </div>
+  </div>
+  <script src="./game.js"></script>
+</body>
+</html>
