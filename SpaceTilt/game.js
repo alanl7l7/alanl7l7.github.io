@@ -7,19 +7,27 @@ const gameOverScreen = document.getElementById('game-over-screen');
 const finalScoreEl = document.getElementById('final-score');
 const startBtn = document.getElementById('start-btn');
 const restartBtn = document.getElementById('restart-btn');
+const controlStatusEl = document.getElementById('control-status');
 
 let width, height;
 let animationId;
 let isPlaying = false;
 let score = 0;
 let tilt = 0; // Gamma value from device orientation
+let hasOrientationListener = false;
+let usingTouchControls = false;
 
 // Resize canvas to fill screen
 function resize() {
-    width = window.innerWidth;
-    height = window.innerHeight;
+    width = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+    height = window.visualViewport ? window.visualViewport.height : window.innerHeight;
     canvas.width = width;
     canvas.height = height;
+
+    if (player) {
+        player.y = height - player.height - Math.max(24, height * 0.06);
+        player.x = Math.min(player.x, width - player.width);
+    }
 }
 window.addEventListener('resize', resize);
 resize();
@@ -28,10 +36,10 @@ resize();
 
 class Player {
     constructor() {
-        this.width = 40;
-        this.height = 60;
+        this.width = Math.max(36, Math.min(52, width * 0.1));
+        this.height = Math.max(52, Math.min(70, height * 0.12));
         this.x = width / 2 - this.width / 2;
-        this.y = height - this.height - 40; // 40px from bottom
+        this.y = height - this.height - Math.max(24, height * 0.06);
         this.color = '#0f0'; // Neon green
         this.speed = 0;
     }
@@ -147,6 +155,12 @@ function init() {
     }
 }
 
+function setControlStatus(message) {
+    if (controlStatusEl) {
+        controlStatusEl.innerText = message;
+    }
+}
+
 // --- Collision Detection ---
 
 // Circle (Asteroid) to Rectangle (Player) collision
@@ -229,6 +243,10 @@ function gameOver() {
 function handleOrientation(event) {
     // gamma is the left-to-right tilt in degrees, where right is positive
     let gamma = event.gamma; 
+
+    if (typeof gamma !== 'number') {
+        return;
+    }
     
     // Handle edge cases (e.g., device is upside down or flat)
     if (gamma > 90) gamma = 90;
@@ -237,22 +255,64 @@ function handleOrientation(event) {
     tilt = gamma;
 }
 
+function enableOrientationControls() {
+    if (!hasOrientationListener) {
+        window.addEventListener('deviceorientation', handleOrientation);
+        hasOrientationListener = true;
+    }
+    usingTouchControls = false;
+    setControlStatus('Tilt controls online. Drag still works as backup.');
+}
+
+function enableTouchControls() {
+    usingTouchControls = true;
+    setControlStatus('Touch steering active. Drag left or right to move.');
+}
+
+function updateTouchTilt(clientX) {
+    const normalized = ((clientX / width) - 0.5) * 2;
+    tilt = normalized * 45;
+}
+
+function handlePointerMove(event) {
+    if (!usingTouchControls || !isPlaying) {
+        return;
+    }
+
+    updateTouchTilt(event.clientX);
+}
+
+function handlePointerDown(event) {
+    if (!usingTouchControls) {
+        return;
+    }
+
+    updateTouchTilt(event.clientX);
+}
+
 function requestAccessAndStart() {
     // Check if DeviceOrientationEvent is supported and requires permission (iOS 13+)
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission()
             .then(permissionState => {
                 if (permissionState === 'granted') {
-                    window.addEventListener('deviceorientation', handleOrientation);
+                    enableOrientationControls();
                     startGame();
                 } else {
-                    alert('Permission to access device orientation was denied. The game needs tilt controls to work!');
+                    enableTouchControls();
+                    startGame();
                 }
             })
-            .catch(console.error);
+            .catch(() => {
+                enableTouchControls();
+                startGame();
+            });
     } else {
-        // Non iOS 13+ devices (Android, older iOS)
-        window.addEventListener('deviceorientation', handleOrientation);
+        if ('DeviceOrientationEvent' in window) {
+            enableOrientationControls();
+        } else {
+            enableTouchControls();
+        }
         startGame();
     }
 }
@@ -269,7 +329,15 @@ function startGame() {
 
 startBtn.addEventListener('click', requestAccessAndStart);
 restartBtn.addEventListener('click', startGame);
+window.addEventListener('pointerdown', handlePointerDown, { passive: true });
+window.addEventListener('pointermove', handlePointerMove, { passive: true });
 
 // Draw initial background before game starts
 ctx.fillStyle = '#000';
 ctx.fillRect(0, 0, width, height);
+
+if ('DeviceOrientationEvent' in window) {
+    setControlStatus('Tilt controls available. If permission fails, touch steering will take over.');
+} else {
+    enableTouchControls();
+}

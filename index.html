@@ -12,6 +12,7 @@
             color: #33ff33;
             font-family: 'Courier New', Courier, monospace;
             height: 100vh;
+            min-height: 100dvh;
             overflow: hidden;
             display: flex;
             justify-content: center;
@@ -103,6 +104,17 @@
             padding: 30px; overflow-y: auto; position: relative;
         }
 
+        .main-screen h2,
+        .main-screen p,
+        .main-screen h3,
+        .inventory-item,
+        .skill-row,
+        .nav-btn,
+        .hud-header,
+        .hud-footer {
+            overflow-wrap: break-word;
+        }
+
         .tab-content { display: none; }
         .tab-content.active {
             display: block; animation: scanIn 0.3s ease-out;
@@ -164,6 +176,124 @@
         ::-webkit-scrollbar { width: 12px; }
         ::-webkit-scrollbar-track { background: #0d0d0d; border-left: 2px solid #33ff33; }
         ::-webkit-scrollbar-thumb { background: #33ff33; }
+
+        @media (max-width: 900px) {
+            body, html {
+                align-items: stretch;
+            }
+
+            #boot-screen {
+                padding: 24px;
+            }
+
+            #boot-text {
+                font-size: 1rem;
+            }
+
+            #boot-loader {
+                font-size: 1.1rem;
+            }
+
+            .terminal-container {
+                width: 100vw;
+                height: 100dvh;
+                border-width: 3px;
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr auto;
+            }
+
+            .hud-header {
+                padding: 12px 16px;
+                gap: 8px 16px;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+                align-items: flex-start;
+            }
+
+            .sidebar {
+                border-right: 0;
+                border-bottom: 3px solid #33ff33;
+                padding: 12px;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .nav-btn {
+                flex: 1 1 140px;
+                min-height: 48px;
+                font-size: 1rem;
+                padding: 10px 12px;
+                border: 2px solid #114411;
+            }
+
+            .nav-btn:hover {
+                padding-left: 12px;
+            }
+
+            .main-screen {
+                padding: 20px 16px 28px;
+            }
+
+            .mission-title,
+            .skill-row {
+                flex-direction: column;
+                gap: 8px;
+                align-items: flex-start;
+            }
+
+            .inventory-item {
+                font-size: 1rem;
+                line-height: 1.5;
+            }
+
+            .hud-footer {
+                padding: 10px 16px;
+                min-height: 44px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            #boot-screen {
+                padding: 16px;
+            }
+
+            #boot-text {
+                font-size: 0.9rem;
+                line-height: 1.4;
+            }
+
+            .terminal-container {
+                border-width: 2px;
+            }
+
+            .hud-header {
+                font-size: 0.85rem;
+            }
+
+            .main-screen {
+                padding: 16px 12px 24px;
+            }
+
+            .main-screen h2 {
+                font-size: 1.2rem;
+            }
+
+            .mission-title {
+                font-size: 1.2rem;
+            }
+
+            .rank,
+            .skill-row,
+            .inventory-item,
+            .nav-btn {
+                font-size: 0.95rem;
+            }
+
+            .blinking-cursor {
+                width: 8px;
+            }
+        }
     </style>
 </head>
 <body>
