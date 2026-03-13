@@ -18,11 +18,55 @@ const startBtn = document.getElementById("start-btn");
 const restartBtn = document.getElementById("restart-btn");
 const playAgainBtn = document.getElementById("play-again-btn");
 
+// Reuse the same simple square-wave synth style used in the portfolio UI.
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
 // Game State
 let isPlaying = false;
 let score = 0;
 let lives = 3;
 let animationId; // Stores the requestAnimationFrame ID so we can cancel it
+
+function unlockAudio() {
+    if (audioCtx.state === "suspended") {
+        audioCtx.resume().catch(() => {});
+    }
+}
+
+function play8BitBlip(startFreq, endFreq, duration, volume = 0.08) {
+    unlockAudio();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = "square";
+    osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(40, endFreq), audioCtx.currentTime + duration);
+
+    gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+}
+
+function playWallOrPaddleSound() {
+    play8BitBlip(500, 300, 0.05, 0.06);
+}
+
+function playBrickBreakSound() {
+    play8BitBlip(740, 980, 0.06, 0.08);
+}
+
+function playLifeLostSound() {
+    play8BitBlip(260, 90, 0.14, 0.12);
+}
+
+function playWinSound() {
+    play8BitBlip(520, 880, 0.08, 0.09);
+    setTimeout(() => play8BitBlip(700, 1100, 0.08, 0.09), 90);
+}
 
 // ==========================================
 // GAME OBJECTS
@@ -134,6 +178,7 @@ function collisionDetection() {
                 ) {
                     // Reverse the ball's vertical direction
                     ball.dy = -ball.dy;
+                    playBrickBreakSound();
                     // Mark brick as destroyed
                     b.status = 0;
                     // Increase score
@@ -165,11 +210,13 @@ function update() {
     // 3. Ball Collision with Left/Right Walls
     if (ball.x + ball.dx > canvas.width - ball.radius || ball.x + ball.dx < ball.radius) {
         ball.dx = -ball.dx;
+        playWallOrPaddleSound();
     }
 
     // 4. Ball Collision with Top Wall
     if (ball.y + ball.dy < ball.radius) {
         ball.dy = -ball.dy;
+        playWallOrPaddleSound();
     } 
     // 5. Ball Collision with Bottom (Paddle or Floor)
     else if (ball.y + ball.dy > canvas.height - ball.radius) {
@@ -186,10 +233,12 @@ function update() {
             // Update ball velocity based on the angle (sharper angle at edges)
             ball.dx = ball.speed * Math.sin(angle);
             ball.dy = -ball.speed * Math.cos(angle);
+            playWallOrPaddleSound();
         } else {
             // Ball missed the paddle -> Lose a life
             lives--;
             livesElement.innerText = lives;
+            playLifeLostSound();
             
             if (!lives) {
                 gameOver();
@@ -279,6 +328,7 @@ function resetPositions() {
 }
 
 function startGame() {
+    unlockAudio();
     startScreen.classList.remove("active");
     gameOverScreen.classList.remove("active");
     winScreen.classList.remove("active");
@@ -304,6 +354,7 @@ function gameOver() {
 function gameWin() {
     isPlaying = false;
     cancelAnimationFrame(animationId);
+    playWinSound();
     winScreen.classList.add("active");
 }
 

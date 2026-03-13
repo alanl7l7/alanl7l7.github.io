@@ -17,11 +17,69 @@ const startBtn = document.getElementById("start-btn");
 const restartBtn = document.getElementById("restart-btn");
 const playAgainBtn = document.getElementById("play-again-btn");
 
+// 8-bit synth audio (same WebAudio pattern as main portfolio UI).
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
 // Global Game State
 let isPlaying = false;
 let score = 0;
 let lives = 3;
 let animationId;
+let lastShootSfxTime = 0;
+
+function unlockAudio() {
+    if (audioCtx.state === "suspended") {
+        audioCtx.resume().catch(() => {});
+    }
+}
+
+function play8BitBlip(startFreq, endFreq, duration, volume = 0.08) {
+    unlockAudio();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = "square";
+    osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(40, endFreq), audioCtx.currentTime + duration);
+
+    gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+}
+
+function playPlayerShootSound() {
+    const now = performance.now();
+    if (now - lastShootSfxTime < 80) {
+        return;
+    }
+    lastShootSfxTime = now;
+    play8BitBlip(880, 520, 0.06, 0.06);
+}
+
+function playAlienShootSound() {
+    play8BitBlip(300, 210, 0.06, 0.05);
+}
+
+function playAlienHitSound() {
+    play8BitBlip(640, 1000, 0.06, 0.08);
+}
+
+function playPlayerHitSound() {
+    play8BitBlip(220, 70, 0.15, 0.12);
+}
+
+function playShieldHitSound() {
+    play8BitBlip(410, 250, 0.05, 0.05);
+}
+
+function playWinSound() {
+    play8BitBlip(520, 880, 0.08, 0.09);
+    setTimeout(() => play8BitBlip(700, 1100, 0.08, 0.09), 90);
+}
 
 // Input State
 const keys = {
@@ -81,6 +139,7 @@ class Player {
             if (currentTime - this.lastShotTime > this.shootCooldown) {
                 // Fire a projectile moving upwards (negative speed)
                 projectiles.push(new Projectile(this.x + this.width / 2 - 2, this.y, -7, false));
+                playPlayerShootSound();
                 this.lastShotTime = currentTime;
             }
         }
@@ -281,6 +340,7 @@ function updateAliens() {
             if (Math.random() < alienFireRate / activeAliensCount) {
                 // Fire projectile downwards (positive speed)
                 projectiles.push(new Projectile(alien.x + alien.width / 2, alien.y + alien.height, 5, true));
+                playAlienShootSound();
             }
         }
     }
@@ -296,6 +356,7 @@ function handleCollisions() {
                 if (alien.active && checkCollision(proj, alien)) {
                     alien.active = false;
                     proj.active = false;
+                    playAlienHitSound();
                     score += 20;
                     scoreElement.innerText = score;
                     break; // Projectile destroyed, stop checking other aliens
@@ -309,6 +370,7 @@ function handleCollisions() {
                 proj.active = false;
                 lives--;
                 livesElement.innerText = lives;
+                playPlayerHitSound();
                 
                 // Visual feedback for getting hit
                 player.color = "#ff3333";
@@ -326,6 +388,7 @@ function handleCollisions() {
                 if (block.active && checkCollision(proj, block)) {
                     block.active = false;
                     proj.active = false;
+                    playShieldHitSound();
                     break;
                 }
             }
@@ -381,6 +444,7 @@ function draw() {
 // ==========================================
 
 function startGame() {
+    unlockAudio();
     startScreen.classList.remove("active");
     gameOverScreen.classList.remove("active");
     winScreen.classList.remove("active");
@@ -409,6 +473,7 @@ function gameOver() {
 function gameWin() {
     isPlaying = false;
     cancelAnimationFrame(animationId);
+    playWinSound();
     winScreen.classList.add("active");
 }
 

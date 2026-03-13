@@ -11,12 +11,52 @@ const highScoreElement = document.getElementById("high-score");
 const startScreen = document.getElementById("start-screen");
 const gameOverScreen = document.getElementById("game-over-screen");
 
+// 8-bit synth audio, consistent with the main menu style.
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
 // Global Game State
 let isPlaying = false;
 let score = 0;
 let scoreCounter = 0; // Used to increment score every few frames
 let highScore = localStorage.getItem("terminalRunnerHighScore") || 0;
 let animationId;
+let lastScoreSfxAt = 0;
+
+function unlockAudio() {
+    if (audioCtx.state === "suspended") {
+        audioCtx.resume().catch(() => {});
+    }
+}
+
+function play8BitBlip(startFreq, endFreq, duration, volume = 0.08) {
+    unlockAudio();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = "square";
+    osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(40, endFreq), audioCtx.currentTime + duration);
+
+    gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+}
+
+function playJumpSound() {
+    play8BitBlip(620, 980, 0.06, 0.07);
+}
+
+function playScoreSound() {
+    play8BitBlip(420, 680, 0.05, 0.05);
+}
+
+function playGameOverSound() {
+    play8BitBlip(240, 70, 0.16, 0.12);
+}
 
 // Physics & World Variables
 let gameSpeed = 6;
@@ -68,6 +108,7 @@ class Player {
         if (this.grounded) {
             this.dy = -this.jumpForce;
             this.grounded = false;
+            playJumpSound();
         }
     }
 
@@ -222,6 +263,12 @@ function updateScore() {
         score++;
         // Pad the score with leading zeros (e.g., 00142)
         scoreElement.innerText = String(score).padStart(5, '0');
+
+        // Keep point sounds periodic so they stay useful and not noisy.
+        if (score - lastScoreSfxAt >= 25) {
+            playScoreSound();
+            lastScoreSfxAt = score;
+        }
         
         // Gradually increase the game speed as the score goes up
         if (score % 100 === 0) {
@@ -283,6 +330,7 @@ function draw() {
 // ==========================================
 
 function startGame() {
+    unlockAudio();
     // Hide overlays
     startScreen.classList.remove("active");
     gameOverScreen.classList.remove("active");
@@ -290,6 +338,7 @@ function startGame() {
     // Reset Game Variables
     score = 0;
     scoreCounter = 0;
+    lastScoreSfxAt = 0;
     gameSpeed = 6;
     spawnTimer = initialSpawnTimer;
     scoreElement.innerText = "00000";
@@ -307,6 +356,7 @@ function startGame() {
 function gameOver() {
     isPlaying = false;
     cancelAnimationFrame(animationId);
+    playGameOverSound();
     
     // Show Game Over overlay
     gameOverScreen.classList.add("active");
