@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alan // Insert Coin</title>
     <style>
+        :root {
+            --bg-main: #0d0d0d;
+            --text-main: #33ff33;
+            --accent: #33ff33;
+            --accent-dim: #005500;
+            --panel-bg: #002200;
+            --sidebar-bg: #050505;
+            --warn: #ffcc00;
+            --soft-text: #9dff9d;
+            --input-bg: #001900;
+            --input-placeholder: #2b8f2b;
+            --button-active-text: #0d0d0d;
+            --hover-invert: #ffffff;
+        }
+
         /* Base Environment */
         body, html {
             margin: 0; padding: 0;
@@ -56,7 +71,7 @@
             width: 95vw; height: 90vh;
             border: 4px solid #33ff33;
             display: grid;
-            grid-template-rows: 50px 1fr 40px;
+            grid-template-rows: 50px 1fr 100px;
             grid-template-columns: 250px 1fr;
             position: relative;
             z-index: 5;
@@ -74,6 +89,35 @@
             padding: 0 20px;
             font-weight: bold;
             background: #002200;
+        }
+
+        .hud-right-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .display-gear-btn {
+            width: 34px;
+            height: 34px;
+            border: 1px solid var(--accent);
+            background: transparent;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 1.15rem;
+            line-height: 1;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.15s ease;
+        }
+
+        .display-gear-btn:hover,
+        .display-gear-btn.active {
+            color: var(--warn);
+            border-color: var(--warn);
+            box-shadow: 0 0 8px rgba(255, 204, 0, 0.35);
         }
 
         .exp-bar { color: #ffcc00; }
@@ -98,6 +142,14 @@
 
         .nav-btn.active {
             background-color: #33ff33; color: #0d0d0d; border: 2px solid #33ff33;
+        }
+
+        .secret-tab-btn {
+            display: none;
+        }
+
+        .secret-tab-btn.unlocked {
+            display: block;
         }
 
         .main-screen {
@@ -144,16 +196,196 @@
             font-size: 1.2rem; border-bottom: 1px dotted #005500; padding-bottom: 5px;
         }
 
+        .skill-row.yellow-glow {
+            color: #ffcc00;
+            border-bottom: 1px dotted #ffcc00;
+            text-shadow: 0 0 6px rgba(255, 204, 0, 0.9), 0 0 14px rgba(255, 204, 0, 0.55);
+            box-shadow: inset 0 -1px 0 rgba(255, 204, 0, 0.7);
+        }
+
+        .skill-row.yellow-glow .exp-bar {
+            color: #ffeb99;
+            text-shadow: 0 0 8px rgba(255, 204, 0, 0.95);
+        }
+
         .inventory-item {
             color: #33ff33; text-decoration: none; display: block;
             margin-bottom: 15px; font-size: 1.2rem;
         }
         .inventory-item:hover { color: #fff; background: #33ff33; padding-left: 10px; }
 
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .theme-btn {
+            border: 1px solid var(--accent);
+            background: rgba(0, 0, 0, 0.25);
+            color: var(--text-main);
+            padding: 10px;
+            text-align: left;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.15s ease;
+        }
+
+        .theme-btn:hover {
+            color: var(--warn);
+            border-color: var(--warn);
+        }
+
+        .theme-btn.active-theme {
+            background: var(--accent);
+            color: var(--button-active-text);
+            font-weight: bold;
+        }
+
         .hud-footer {
             grid-column: 1 / -1; border-top: 4px solid #33ff33;
-            padding: 0 20px; display: flex; align-items: center;
-            font-size: 0.9rem; background: #002200;
+            padding: 8px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            background: #002200;
+        }
+
+        .cmd-output {
+            min-height: 1.2em;
+            max-height: 2.4em;
+            overflow: hidden;
+            line-height: 1.2;
+            color: #9dff9d;
+        }
+
+        .cmd-output.error {
+            color: #ff7d7d;
+        }
+
+        .cmd-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cmd-prompt {
+            color: #33ff33;
+            font-weight: bold;
+        }
+
+        .cmd-input {
+            flex: 1;
+            background: #001900;
+            border: 1px solid #33ff33;
+            color: #33ff33;
+            font-family: inherit;
+            font-size: 0.95rem;
+            padding: 6px 8px;
+            outline: none;
+        }
+
+        .cmd-input::placeholder {
+            color: #2b8f2b;
+        }
+
+        .cmd-input:focus {
+            border-color: #ffcc00;
+            box-shadow: 0 0 8px rgba(255, 204, 0, 0.35);
+        }
+
+        .fine-print {
+            font-size: 0.72rem;
+            color: #6ea86e;
+            letter-spacing: 0.02em;
+            opacity: 0.85;
+            margin-top: 10px;
+        }
+
+        .secret-word {
+            color: inherit;
+            border-bottom: 1px dashed rgba(51, 255, 51, 0.35);
+            cursor: pointer;
+            transition: color 0.15s ease, text-shadow 0.15s ease;
+        }
+
+        .secret-word:hover {
+            color: #ffcc00;
+            text-shadow: 0 0 8px rgba(255, 204, 0, 0.65);
+        }
+
+        .hud-header.exp-gain {
+            animation: hudPulse 0.7s ease-out;
+        }
+
+        @keyframes hudPulse {
+            0% { box-shadow: inset 0 0 0 rgba(255, 204, 0, 0); }
+            50% { box-shadow: inset 0 0 24px rgba(255, 204, 0, 0.35); }
+            100% { box-shadow: inset 0 0 0 rgba(255, 204, 0, 0); }
+        }
+
+        .exp-float {
+            position: fixed;
+            z-index: 10000;
+            color: #ffcc00;
+            font-weight: bold;
+            font-size: 0.95rem;
+            pointer-events: none;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.9);
+            animation: expFloat 0.9s ease-out forwards;
+        }
+
+        @keyframes expFloat {
+            0% { opacity: 0; transform: translate(-50%, 4px) scale(0.95); }
+            20% { opacity: 1; transform: translate(-50%, -3px) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -34px) scale(1.05); }
+        }
+
+        body.neon-mode {
+            color: #ff7bd6;
+        }
+
+        body.neon-mode .terminal-container,
+        body.neon-mode .hud-header,
+        body.neon-mode .sidebar,
+        body.neon-mode .hud-footer {
+            border-color: #ff4fcf;
+        }
+
+        body.neon-mode .terminal-container {
+            box-shadow: 0 0 20px rgba(255, 79, 207, 0.4) inset;
+        }
+
+        body.neon-mode .hud-header,
+        body.neon-mode .hud-footer {
+            background: #2a0020;
+        }
+
+        body.neon-mode .sidebar {
+            background: #170012;
+        }
+
+        body.neon-mode .nav-btn {
+            color: #ff7bd6;
+        }
+
+        body.neon-mode .nav-btn.active {
+            background-color: #ff4fcf;
+            border-color: #ff4fcf;
+            color: #150010;
+        }
+
+        body.neon-mode .exp-bar {
+            color: #ffd6f3;
+        }
+
+        body.neon-mode .cmd-input {
+            border-color: #ff4fcf;
+            background: #1d0016;
+            color: #ff9fe7;
         }
 
         .blinking-cursor {
@@ -170,7 +402,151 @@
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
                          linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.03), rgba(0, 0, 255, 0.03));
             background-size: 100% 3px, 3px 100%;
+            opacity: 0.97;
+            animation: crtFlicker 4.7s infinite steps(1, end);
             pointer-events: none; z-index: 9999;
+        }
+
+        @keyframes crtFlicker {
+            0% { opacity: 0.97; }
+            4% { opacity: 0.95; }
+            7% { opacity: 0.98; }
+            9% { opacity: 0.96; }
+            13% { opacity: 0.99; }
+            21% { opacity: 0.96; }
+            22% { opacity: 0.94; }
+            34% { opacity: 0.98; }
+            49% { opacity: 0.95; }
+            51% { opacity: 0.99; }
+            66% { opacity: 0.96; }
+            71% { opacity: 0.98; }
+            83% { opacity: 0.95; }
+            90% { opacity: 0.99; }
+            100% { opacity: 0.97; }
+        }
+
+        .glitch-hover:hover {
+            animation: textGlitch 0.2s linear infinite;
+            color: var(--warn);
+            text-shadow: 2px 0 var(--accent), -2px 0 #ff0055;
+        }
+
+        @keyframes textGlitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 1px) }
+            40% { transform: translate(-1px, -1px) }
+            60% { transform: translate(2px, 1px) }
+            80% { transform: translate(1px, -1px) }
+            100% { transform: translate(0) }
+        }
+
+        .crash-screen {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(40, 0, 0, 0.95);
+            color: #ff4d4d;
+            font-size: 1.5rem;
+            text-align: center;
+            z-index: 9998;
+            border: 4px solid #ff2222;
+            text-shadow: 0 0 8px rgba(255, 80, 80, 0.9);
+            animation: crashBlink 0.12s steps(2, end) infinite;
+        }
+
+        @keyframes crashBlink {
+            50% { opacity: 0.8; }
+        }
+
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        body,
+        html,
+        #boot-screen {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+        }
+
+        .terminal-container {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-dim) inset;
+        }
+
+        .hud-header,
+        .hud-footer {
+            background: var(--panel-bg);
+            border-color: var(--accent);
+        }
+
+        .sidebar {
+            background: var(--sidebar-bg);
+            border-right-color: var(--accent);
+        }
+
+        .nav-btn {
+            color: var(--text-main);
+        }
+
+        .nav-btn:hover {
+            color: var(--warn);
+            border-left-color: var(--warn);
+        }
+
+        .nav-btn.active {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: var(--button-active-text);
+        }
+
+        .exp-bar,
+        .rank,
+        #boot-loader {
+            color: var(--warn);
+        }
+
+        .inventory-item {
+            color: var(--text-main);
+        }
+
+        .inventory-item:hover {
+            color: var(--hover-invert);
+            background: var(--accent);
+        }
+
+        .cmd-output,
+        .fine-print {
+            color: var(--soft-text);
+        }
+
+        .cmd-input {
+            background: var(--input-bg);
+            border-color: var(--accent);
+            color: var(--text-main);
+        }
+
+        .cmd-input::placeholder {
+            color: var(--input-placeholder);
+        }
+
+        .blinking-cursor,
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+            border-left-color: var(--accent);
         }
 
         ::-webkit-scrollbar { width: 12px; }
@@ -208,6 +584,11 @@
                 flex-wrap: wrap;
                 justify-content: flex-start;
                 align-items: flex-start;
+            }
+
+            .hud-right-controls {
+                width: 100%;
+                justify-content: space-between;
             }
 
             .sidebar {
@@ -251,6 +632,10 @@
                 padding: 10px 16px;
                 min-height: 44px;
             }
+
+            .cmd-output {
+                max-height: 2.8em;
+            }
         }
 
         @media (max-width: 560px) {
@@ -293,12 +678,18 @@
             .blinking-cursor {
                 width: 8px;
             }
+
+            .cmd-input {
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
 <body>
 
+    <canvas id="matrix-canvas"></canvas>
     <div class="crt-overlay"></div>
+    <div id="crash-screen" class="crash-screen">!! RED ALERT !!<br>sudo power detected.<br>System recovered by duct tape.</div>
 
     <!-- 1. FAKE BOOT SCREEN -->
     <div id="boot-screen">
@@ -313,7 +704,11 @@
         <div class="hud-header">
             <span>CAFFEINE: 100% | STRESS: 12%</span>
             <span>PLAYER: ALAN</span>
-            <span class="exp-bar">LVL: 26 [███████░░░] 74%</span>
+            <div class="hud-right-controls">
+                <span id="hud-exp" class="exp-bar">LVL: 26 [███████░░░] 74%</span>
+                <button id="audio-toggle-btn" class="display-gear-btn" type="button" title="Toggle Audio">🔊</button>
+                <button id="display-gear-btn" class="display-gear-btn" type="button" onclick="openDisplaySettings()" aria-label="Open display settings" title="Display Settings">⚙</button>
+            </div>
         </div>
 
         <div class="sidebar">
@@ -321,59 +716,144 @@
             <button class="nav-btn" onclick="switchTab('projects', this)">> PROJECTS</button>
             <button class="nav-btn" onclick="switchTab('skill_tree', this)">> SKILL_TREE</button>
             <button class="nav-btn" onclick="switchTab('inventory', this)">> INVENTORY</button>
+            <button id="cheat-tab-btn" class="nav-btn secret-tab-btn" onclick="switchTab('cheat_codes', this)">> CHEAT_CODES</button>
         </div>
 
         <div class="main-screen">
             <!-- Tab 1 -->
             <div id="about_me" class="tab-content active">
-                <h2>>>> HELLO, WORLD.</h2>
-                <p><strong>ROLE:</strong> Solution Architect / Code Janitor / Full-Stack Mage</p>
+                <h2 class="glitch-hover">>>> HELLO, WORLD.</h2>
+                <p><strong>ROLE:</strong>Solution Architect / Code Janitor / Full-Stack Mage</p>
                 <p><strong>LOCATION:</strong> Earth (Mostly)</p>
                 <br>
                 <p><strong>BIO:</strong></p>
-                <p>I build solution first, then worry about pretty code later. I experiment with all kind of stuff to get it done, and argue with my agents most of the time.</p>
+                <p>I build solution first, then worry about pretty code later. I experiment with all kind of stuff to get it done, and argue with my <span id="bio-secret-trigger" class="secret-word" title="Not suspicious at all">agents</span> most of the time.</p>
                 <p>> Status: Ready to write some code. Or at least copy-paste it from StackOverflow. jk its mostly gemini now</p>
+                <p class="fine-print">* hint: konami.</p>
             </div>
 
             <!-- Tab 2 -->
             <div id="projects" class="tab-content">
-                <h2>>>> RECENT WORK</h2>
+                <h2 class="glitch-hover">>>> RECENT WORK</h2>
                 <div class="mission-card">
-                    <h3 class="mission-title">TenderVise <span class="rank">EXP: 1500</span></h3>
+                    <h3 class="mission-title">TenderVise <span class="rank">EXP: 200</span></h3>
                     <p>STACK:[ React, Python, Supabase ]</p>
-                    <p>> Mostly frontend then connecting to the database and gemini API.</p>
+                    <p>> Did the register page, connecting to database, then a tons of mock data.</p>
                 </div>
                 <div class="mission-card">
-                    <h3 class="mission-title">Kenyalang <span class="rank">EXP: 1999</span></h3>
+                    <h3 class="mission-title">Kenyalang (Duolingo for Malaysia) <span class="rank">EXP: 100</span></h3>
                     <p>STACK:[ Python, Agentic Frameworks ]</p>
                     <p>> Processing OCR data. Data everything then RAG.</p>
+                </div>
+                <div class="mission-card">
+                    <h3 class="mission-title">Automated scraping system<span class="rank">EXP: 1000</span></h3>
+                    <p>STACK:[ Browser-use, Aiden, Agentic Frameworks ]</p>
+                    <p>> Automate browser usage; calling agent for help.</p>
+                </div>
+                <div class="mission-card">
+                    <h3 class="mission-title">Chat Revamp: UI Unplugged <span class="rank">EXP: 420</span></h3>
+                    <p>STACK:[ React, Axios, Custom Hooks ]</p>
+                    <p>> Built reusable useChat hook so UI and API stop arguing in public. Low-latency rendering, clean component vibes, fewer emotional re-renders.</p>
+                </div>
+                <div class="mission-card">
+                    <h3 class="mission-title">Carouselly: Deal Sniper<span class="rank">EXP: 500</span></h3>
+                    <p>STACK:[ Python, Playwright Stealth, Telegram Bot API ]</p>
+                    <p>> Automated listing monitor with instant price-filtered alerts. Manual search time reduced by 100%. Fingers now available for snacks.</p>
+                </div>
+                <div class="mission-card">
+                    <h3 class="mission-title">Self-Serve AI HR Portal <span class="rank">EXP: 450</span></h3>
+                    <p>STACK:[ Streamlit, SQLite, Gemini AI ]</p>
+                    <p>> Unified HR dashboard for contract generation and policy Q&A. Onboarding now happens in one place instead of 47 random tabs.</p>
+                </div>
+                <div class="mission-card">
+                    <h3 class="mission-title">AI WhatsApp Assistant <span class="rank">EXP: 520</span></h3>
+                    <p>STACK:[ n8n, Gemini API, WhatsApp Cloud API ]</p>
+                    <p>> Autonomous multi-turn support agent with voice-note transcription and 24/7 replies. It works night shift so WE can pretend WE sleep.</p>
+                </div>
+                <div class="mission-card">
+                    <h3 class="mission-title">Telegram Paperboy <span class="rank">EXP: 360</span></h3>
+                    <p>STACK:[ n8n, Telegram Bot API, AI Summarization ]</p>
+                    <p>> Built a high-signal news pipeline that aggregates, filters, and summarizes live feeds. Basically a digital paper route with less bicycle.</p>
+                </div>
+                <div class="mission-card">
+                    <h3 class="mission-title">Automated (Half!) Influencer <span class="rank">EXP: 390</span></h3>
+                    <p>STACK:[ n8n, Google Sheets, LinkedIn API ]</p>
+                    <p>> Hands-free content ops from spreadsheet to scheduled posts with status tracking. Half automated because full influencer mode felt dangerous.</p>
                 </div>
             </div>
 
             <!-- Tab 3 -->
             <div id="skill_tree" class="tab-content">
-                <h2>>>> TECH STACK STATS</h2>
+                <h2 class="glitch-hover">>>> TECH STACK STATS</h2>
                 <br>
-                <div class="skill-row"><span>> Python</span> <span class="exp-bar">[█████████░] LVL 9</span></div>
-                <div class="skill-row"><span>> React.js</span> <span class="exp-bar">[████████░░] LVL 8</span></div>
-                <div class="skill-row"><span>> Googling Errors</span> <span class="exp-bar">[██████████] MAX</span></div>
+                <div class="skill-row yellow-glow"><span>> Googling Errors/Gemini/Chatgpt</span> <span class="exp-bar">[██████████] LVL MAX</span></div>
+                <div class="skill-row"><span>> Python</span> <span class="exp-bar">[█████░░░░░] LVL 5</span></div>
+                <div class="skill-row"><span>> JavaScript</span> <span class="exp-bar">[█████░░░░░] LVL 5</span></div>
+                <div class="skill-row"><span>> SQL</span> <span class="exp-bar">[██░░░░░░░░] LVL 2</span></div>
+                <div class="skill-row"><span>> React.js</span> <span class="exp-bar">[███░░░░░░░] LVL 3</span></div>
+                <div class="skill-row"><span>> PostgreSQL</span> <span class="exp-bar">[███░░░░░░░] LVL 3</span></div>
+                <div class="skill-row"><span>> Supabase</span> <span class="exp-bar">[███░░░░░░░] LVL 3</span></div>
+                <div class="skill-row"><span>> MongoDB</span> <span class="exp-bar">[██░░░░░░░░] LVL 2</span></div>
+                <div class="skill-row"><span>> ChromaDB</span> <span class="exp-bar">[██░░░░░░░░] LVL 2</span></div>
+                <div class="skill-row"><span>> N8N</span> <span class="exp-bar">[███░░░░░░░] LVL 3</span></div>
+                <br>
+                <p><strong>> AI & DATA </strong></p>
+                <div class="skill-row"><span>> Agentic AI Architecture</span> <span class="exp-bar">[█░░░░░░░░░] LVL 1</span></div>
+                <div class="skill-row"><span>> LangChain</span> <span class="exp-bar">[█░░░░░░░░░] LVL 1</span></div>
+                <div class="skill-row"><span>> OCR</span> <span class="exp-bar">[█░░░░░░░░░] LVL 1</span></div>
+                <div class="skill-row"><span>> RAG Implementation</span> <span class="exp-bar">[█░░░░░░░░░] LVL 1</span></div>
+                <br>
+                <p><strong>> CLOUD </strong></p>
+                <div class="skill-row"><span>> Google Cloud (VM, VPC, Buckets)</span> <span class="exp-bar">[█░░░░░░░░░] LVL 1</span></div>
+                <div class="skill-row"><span>> Docker</span> <span class="exp-bar">[█░░░░░░░░░] LVL 1</span></div>
+                <br>
+                <p><strong>> EXPLORING</strong></p>
+                <div class="skill-row"><span>> BigQuery</span> <span class="exp-bar">[█░░░░░░░░░] LVL 1</span></div>
+                <div class="skill-row"><span>> Kubernetes</span> <span class="exp-bar">[█░░░░░░░░░] LVL 1</span></div>
+                <div class="skill-row"><span>> Open-Source LLM Fine-Tuning</span> <span class="exp-bar">[█░░░░░░░░░] LVL 1</span></div>
+                <div class="skill-row"><span>> Machine Learning (Predictive Modeling)</span> <span class="exp-bar">[█░░░░░░░░░] LVL 1</span></div>
             </div>
 
             <!-- Tab 4 -->
             <div id="inventory" class="tab-content">
-                <h2>>>> SOCIAL LINKS</h2>
+                <h2 class="glitch-hover">>>> SOCIAL LINKS</h2>
                 <br>
                 <a href="./BrickBreaker/index.html" class="inventory-item" target="_blank" rel="noopener noreferrer">> [ LAUNCH: BrickBreaker ] - Play game</a>
                 <a href="./SpaceInvader/index.html" class="inventory-item" target="_blank" rel="noopener noreferrer">> [ LAUNCH: SpaceInvader ] - Play game</a>
                 <a href="./endlessrunner/index.html" class="inventory-item" target="_blank" rel="noopener noreferrer">> [ LAUNCH: EndlessRunner ] - Play game</a>
                 <a href="./SpaceTilt/index.html" class="inventory-item" target="_blank" rel="noopener noreferrer">> [ LAUNCH: SpaceTilt ] - Play game</a>
-                <a href="my email to be updated" class="inventory-item">> [ EQUIP: Email ] - Send a message</a>
-                <a href="#" class="inventory-item">> [ EQUIP: GitHub ] - Look at my commits</a>
+                <a href="mailto:leeleongl7l7@gmail.com" class="inventory-item">> [ EQUIP: Email ] - Send a message</a>
+                <a href="https://github.com/alanl7l7/" class="inventory-item">> [ EQUIP: GitHub ] - Look at my commits</a>
+            </div>
+
+            <div id="display_settings" class="tab-content">
+                <h2 class="glitch-hover">>>> DISPLAY SETTINGS</h2>
+                <p>> Pick your monitor profile:</p>
+                <div class="theme-grid">
+                    <button class="theme-btn" data-theme="matrix" type="button">MATRIX GREEN</button>
+                    <button class="theme-btn" data-theme="amber" type="button">AMBER MONOCHROME</button>
+                    <button class="theme-btn" data-theme="pipboy" type="button">FALLOUT PIP-BOY</button>
+                    <button class="theme-btn" data-theme="cyberpunk" type="button">CYBERPUNK BLUE/PINK</button>
+                </div>
+            </div>
+
+            <div id="cheat_codes" class="tab-content">
+                <h2 class="glitch-hover">>>> CHEAT CODES UNLOCKED</h2>
+                <div class="mission-card">
+                    <h3 class="mission-title">Konami Protocol <span class="rank">EXP: ???</span></h3>
+                    <p>> You found the hidden mode. Respect.</p>
+                    <p>> Palette switched to NEON PINK. System morale +999.</p>
+                </div>
             </div>
         </div>
 
         <div class="hud-footer">
-            <span id="cmd-text">> Playing loading animation... Done.</span><div class="blinking-cursor"></div>
+            <div id="cmd-text" class="cmd-output">> Playing loading animation... Done.</div>
+            <div class="cmd-input-row">
+                <span class="cmd-prompt">></span>
+                <input id="cmd-input" class="cmd-input" type="text" autocomplete="off" spellcheck="false" placeholder="type help" aria-label="Terminal command input">
+                <div class="blinking-cursor"></div>
+            </div>
         </div>
     </div>
         
@@ -382,7 +862,130 @@
     <script>
         // --- ADD THIS BLOCK: 8-Bit Audio Synthesizer ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const terminalLog = [];
+        const terminalMaxLines = 2;
+        let hudExpRaw = 740;
+        let secretExpClaimed = false;
+        const themes = {
+            matrix: {
+                '--bg-main': '#0d0d0d',
+                '--text-main': '#33ff33',
+                '--accent': '#33ff33',
+                '--accent-dim': '#005500',
+                '--panel-bg': '#002200',
+                '--sidebar-bg': '#050505',
+                '--warn': '#ffcc00',
+                '--soft-text': '#9dff9d',
+                '--input-bg': '#001900',
+                '--input-placeholder': '#2b8f2b',
+                '--button-active-text': '#0d0d0d',
+                '--hover-invert': '#ffffff'
+            },
+            amber: {
+                '--bg-main': '#101010',
+                '--text-main': '#ffb44a',
+                '--accent': '#ffb44a',
+                '--accent-dim': '#6a3f0c',
+                '--panel-bg': '#241507',
+                '--sidebar-bg': '#171006',
+                '--warn': '#ffe2ad',
+                '--soft-text': '#f2bf74',
+                '--input-bg': '#1d1207',
+                '--input-placeholder': '#a66c2b',
+                '--button-active-text': '#1a1008',
+                '--hover-invert': '#1a1008'
+            },
+            pipboy: {
+                '--bg-main': '#0a140a',
+                '--text-main': '#8dff6f',
+                '--accent': '#8dff6f',
+                '--accent-dim': '#2f6a2a',
+                '--panel-bg': '#132412',
+                '--sidebar-bg': '#0e1c0e',
+                '--warn': '#c7ff8e',
+                '--soft-text': '#a7ff8f',
+                '--input-bg': '#102010',
+                '--input-placeholder': '#5f9a56',
+                '--button-active-text': '#0a140a',
+                '--hover-invert': '#0a140a'
+            },
+            cyberpunk: {
+                '--bg-main': '#0a0f1f',
+                '--text-main': '#63dbff',
+                '--accent': '#ff4fcf',
+                '--accent-dim': '#5a2b80',
+                '--panel-bg': '#1a0d2c',
+                '--sidebar-bg': '#130a25',
+                '--warn': '#63dbff',
+                '--soft-text': '#9ce8ff',
+                '--input-bg': '#151434',
+                '--input-placeholder': '#4a78aa',
+                '--button-active-text': '#14081d',
+                '--hover-invert': '#14081d'
+            }
+        };
+        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+        let konamiIndex = 0;
+        let cheatUnlocked = false;
+        let audioEnabled = true;
+
+        // --- MATRIX RAIN LOGIC ---
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレゲゼデベペオォコソトノホモヨョロゴゾドボポヴッン';
+        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const nums = '0123456789';
+        const alphabet = katakana + latin + nums;
+
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Get current theme color for rain
+            const rootStyles = getComputedStyle(document.documentElement);
+            const rainColor = rootStyles.getPropertyValue('--accent').trim() || '#33ff33';
+            
+            ctx.fillStyle = rainColor;
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            columns = canvas.width / fontSize;
+            drops = [];
+            for (let x = 0; x < columns; x++) {
+                drops[x] = 1;
+            }
+        });
+
+        setInterval(drawMatrix, 30);
+        // -------------------------
+
         function play8BitClick() {
+            if (!audioEnabled) return;
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -399,14 +1002,268 @@
             osc.start();
             osc.stop(audioCtx.currentTime + 0.05); // Lasts exactly 50 milliseconds
         }
+
+        function playVictorySound() {
+            if (!audioEnabled) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const notes = [523.25, 659.25, 783.99, 1046.5];
+            const start = audioCtx.currentTime;
+
+            notes.forEach((freq, i) => {
+                const t = start + i * 0.12;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(freq, t);
+
+                gain.gain.setValueAtTime(0.0001, t);
+                gain.gain.exponentialRampToValueAtTime(0.08, t + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.11);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(t);
+                osc.stop(t + 0.12);
+            });
+        }
+
+        function normalizeKey(key) {
+            if (key.startsWith('Arrow')) return key;
+            return key.toLowerCase();
+        }
+
+        function applyTheme(themeName, shouldPersist = true) {
+            const selectedTheme = themes[themeName] || themes.matrix;
+
+            Object.entries(selectedTheme).forEach(([key, value]) => {
+                document.documentElement.style.setProperty(key, value);
+            });
+
+            document.querySelectorAll('.theme-btn').forEach((btn) => {
+                btn.classList.toggle('active-theme', btn.dataset.theme === themeName);
+            });
+
+            if (shouldPersist) {
+                localStorage.setItem('alan_display_theme', themeName);
+            }
+        }
+
+        function unlockCheatMode() {
+            if (cheatUnlocked) return;
+            cheatUnlocked = true;
+
+            const cheatBtn = document.getElementById('cheat-tab-btn');
+            if (cheatBtn) cheatBtn.classList.add('unlocked');
+
+            applyTheme('cyberpunk');
+            setCmdOutput('> CHEAT CODE ACCEPTED. Neon mode engaged.');
+            playVictorySound();
+
+            if (cheatBtn) {
+                switchTab('cheat_codes', cheatBtn);
+            }
+        }
+
+        function handleKonamiInput(event) {
+            const key = normalizeKey(event.key);
+            const expected = konamiCode[konamiIndex];
+
+            if (key === expected) {
+                konamiIndex += 1;
+                if (konamiIndex === konamiCode.length) {
+                    konamiIndex = 0;
+                    unlockCheatMode();
+                }
+                return;
+            }
+
+            konamiIndex = key === konamiCode[0] ? 1 : 0;
+        }
+
+        function setCmdOutput(message, isError = false) {
+            const cmdText = document.getElementById('cmd-text');
+            if (!cmdText) return;
+
+            terminalLog.push(message);
+            while (terminalLog.length > terminalMaxLines) {
+                terminalLog.shift();
+            }
+
+            cmdText.innerHTML = terminalLog.map(line => `<div>${line}</div>`).join('');
+            cmdText.classList.toggle('error', Boolean(isError));
+        }
+
+        function updateHudExpDisplay() {
+            const hudExp = document.getElementById('hud-exp');
+            if (!hudExp) return;
+
+            const percent = Math.min(100, Math.floor(hudExpRaw / 10));
+            const blocks = Math.floor(percent / 10);
+            const barString = `${'█'.repeat(blocks)}${'░'.repeat(10 - blocks)}`;
+            hudExp.textContent = `LVL: 26 [${barString}] ${percent}%`;
+        }
+
+        function spawnExpFloat(x, y) {
+            const el = document.createElement('div');
+            el.className = 'exp-float';
+            el.textContent = '+100 EXP';
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            document.body.appendChild(el);
+            el.addEventListener('animationend', () => el.remove());
+        }
+
+        function awardSecretExp(event) {
+            if (secretExpClaimed) {
+                setCmdOutput('> Secret already claimed. No EXP farming on this server.');
+                return;
+            }
+
+            secretExpClaimed = true;
+            hudExpRaw += 100;
+            updateHudExpDisplay();
+            setCmdOutput('> SECRET FOUND: +100 EXP awarded. Achievement: Curious Clicker.');
+
+            const hudHeader = document.querySelector('.hud-header');
+            if (hudHeader) {
+                hudHeader.classList.remove('exp-gain');
+                void hudHeader.offsetWidth;
+                hudHeader.classList.add('exp-gain');
+            }
+
+            const x = event && typeof event.clientX === 'number' ? event.clientX : window.innerWidth / 2;
+            const y = event && typeof event.clientY === 'number' ? event.clientY : window.innerHeight / 2;
+            spawnExpFloat(x, y);
+            play8BitClick();
+        }
+
+        function triggerFakeCrash() {
+            const crashScreen = document.getElementById('crash-screen');
+            if (!crashScreen) return;
+
+            crashScreen.style.display = 'flex';
+            setTimeout(() => {
+                crashScreen.style.display = 'none';
+                setCmdOutput('> Kernel survived. Mostly. Please stop attacking production.');
+            }, 1800);
+        }
+
+        function runCommand(rawValue) {
+            const command = rawValue.trim().toLowerCase();
+            if (!command) return;
+
+            setCmdOutput(`> ${command}`);
+
+            if (command === 'help') {
+                setCmdOutput('> Commands: help | ls | cd [dir] | clear | whoami | contact | sudo rm -rf / | theme [name]');
+                return;
+            }
+
+            if (command === 'ls') {
+                setCmdOutput('> about_me/  projects/  skill_tree/  inventory/  display_settings/');
+                return;
+            }
+
+            if (command.startsWith('cd ')) {
+                const target = command.replace('cd ', '').trim();
+                const tabMap = {
+                    'about_me': 'about_me', 'projects': 'projects', 'skill_tree': 'skill_tree',
+                    'inventory': 'inventory', 'display_settings': 'display_settings', 'cheat_codes': 'cheat_codes'
+                };
+                
+                if (tabMap[target]) {
+                    if (target === 'cheat_codes' && !cheatUnlocked) {
+                        setCmdOutput('> cd: cheat_codes: Permission denied', true);
+                        return;
+                    }
+                    if (target === 'display_settings') {
+                        openDisplaySettings();
+                    } else {
+                        const btn = document.querySelector(`.nav-btn[onclick*="${target}"]`);
+                        if (btn) switchTab(target, btn);
+                    }
+                    return;
+                } else if (target === '..' || target === '/') {
+                    setCmdOutput('> Already at root directory.');
+                    return;
+                } else {
+                    setCmdOutput(`> cd: ${target}: No such file or directory`, true);
+                    return;
+                }
+            }
+
+            if (command.startsWith('theme ')) {
+                const themeName = command.replace('theme ', '').trim();
+                if (!themes[themeName]) {
+                    setCmdOutput('> Theme not found. Use: matrix | amber | pipboy | cyberpunk', true);
+                    return;
+                }
+
+                applyTheme(themeName);
+                setCmdOutput(`> Theme switched to ${themeName.toUpperCase()}.`);
+                return;
+            }
+
+            if (command === 'clear') {
+                terminalLog.length = 0;
+                const cmdText = document.getElementById('cmd-text');
+                if (cmdText) {
+                    cmdText.innerHTML = '';
+                    cmdText.classList.remove('error');
+                }
+                return;
+            }
+
+            if (command === 'whoami') {
+                setCmdOutput('> Guest User (Unprivileged). Root access denied by life choices.');
+                return;
+            }
+
+            if (command === 'contact') {
+                const emailLink = document.querySelector('a[href^="mailto:"]');
+                if (emailLink) {
+                    setCmdOutput('> Opening comms channel... launching mail client.');
+                    window.location.href = emailLink.getAttribute('href');
+                } else {
+                    setCmdOutput('> Email module missing. Please reinstall social skills.', true);
+                }
+                return;
+            }
+
+            if (command === 'sudo rm -rf /') {
+                setCmdOutput('> Permission denied. Nice try, chaos goblin.', true);
+                triggerFakeCrash();
+                return;
+            }
+
+            setCmdOutput('> Unknown command. Type help before improvising.', true);
+        }
         
         function switchTab(tabId, element) {
             play8BitClick();
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            const gearBtn = document.getElementById('display-gear-btn');
+            if (gearBtn) gearBtn.classList.remove('active');
             document.getElementById(tabId).classList.add('active');
             element.classList.add('active');
-            document.getElementById('cmd-text').innerText = `> Viewing ${tabId.replace('_', ' ')}...`;
+            setCmdOutput(`> Viewing ${tabId.replace('_', ' ')}...`);
+        }
+
+        function openDisplaySettings() {
+            play8BitClick();
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+            const displayTab = document.getElementById('display_settings');
+            const gearBtn = document.getElementById('display-gear-btn');
+            if (displayTab) displayTab.classList.add('active');
+            if (gearBtn) gearBtn.classList.add('active');
+
+            setCmdOutput('> Viewing display settings...');
         }
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -416,11 +1273,61 @@
             const bootLoader = document.getElementById('boot-loader');
             const bootBar = document.getElementById('boot-bar');
             const bootPercent = document.getElementById('boot-percent');
+            const cmdInput = document.getElementById('cmd-input');
+            const bioSecretTrigger = document.getElementById('bio-secret-trigger');
+            const themeButtons = document.querySelectorAll('.theme-btn');
+
+            const savedTheme = localStorage.getItem('alan_display_theme') || 'matrix';
+            applyTheme(savedTheme, false);
+
+            updateHudExpDisplay();
+
+            if (bioSecretTrigger) {
+                bioSecretTrigger.addEventListener('click', awardSecretExp);
+            }
+
+            if (cmdInput) {
+                cmdInput.addEventListener('keydown', (event) => {
+                    if (event.key !== 'Enter') return;
+
+                    play8BitClick();
+                    runCommand(cmdInput.value);
+                    cmdInput.value = '';
+                });
+            }
+
+            const audioToggleBtn = document.getElementById('audio-toggle-btn');
+            if (audioToggleBtn) {
+                audioToggleBtn.addEventListener('click', () => {
+                    audioEnabled = !audioEnabled;
+                    audioToggleBtn.textContent = audioEnabled ? '🔊' : '🔇';
+                    if (audioEnabled) play8BitClick();
+                });
+            }
+
+            // Global typing auto-focuses the terminal
+            document.addEventListener('keydown', (e) => {
+                if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && document.activeElement !== cmdInput) {
+                    if (cmdInput) cmdInput.focus();
+                }
+            });
+
+            themeButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const themeName = button.dataset.theme;
+                    if (!themeName) return;
+                    applyTheme(themeName);
+                    setCmdOutput(`> Display profile loaded: ${themeName.toUpperCase()}.`);
+                });
+            });
+
+            document.addEventListener('keydown', handleKonamiInput);
 
             // Skip if already loaded this session
             if (sessionStorage.getItem('alan_portfolio_booted') === 'true') {
                 bootScreen.style.display = 'none';
                 mainOs.style.opacity = '1';
+                if (cmdInput) cmdInput.focus();
                 return;
             }
 
@@ -472,7 +1379,10 @@
                     setTimeout(() => {
                         bootScreen.style.opacity = '0';
                         mainOs.style.opacity = '1';
-                        setTimeout(() => bootScreen.style.display = 'none', 500); 
+                        setTimeout(() => {
+                            bootScreen.style.display = 'none';
+                            if (cmdInput) cmdInput.focus();
+                        }, 500); 
                     }, 1200); // Wait a tiny bit longer so they can read the joke at the end
                 }
             }
