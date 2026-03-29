@@ -156,6 +156,26 @@
             padding: 30px; overflow-y: auto; position: relative;
         }
 
+        .hidden-contact-link {
+            position: absolute;
+            right: 8px;
+            bottom: 8px;
+            font-size: 0.55rem;
+            line-height: 1;
+            color: var(--text-main);
+            text-decoration: none;
+            opacity: 0.04;
+            user-select: none;
+            transition: opacity 0.2s ease, text-shadow 0.2s ease;
+        }
+
+        .hidden-contact-link:hover,
+        .hidden-contact-link:focus-visible {
+            opacity: 0.95;
+            text-shadow: 0 0 8px rgba(255, 204, 0, 0.75);
+            outline: none;
+        }
+
         .main-screen h2,
         .main-screen p,
         .main-screen h3,
@@ -830,6 +850,8 @@
                     <p>> Palette switched to NEON PINK. System morale +999.</p>
                 </div>
             </div>
+
+            <a href="./ContactCard/index.html" class="hidden-contact-link" title="Maintenance Port" aria-label="Hidden link to Contact Card">[•]</a>
         </div>
 
         <div class="hud-footer">
