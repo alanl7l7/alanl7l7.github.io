@@ -109,6 +109,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
     }
 
     .cat-sprite {
@@ -121,12 +122,17 @@
     }
 
     .floor-glow {
-      width: 100px;
-      height: 20px;
-      background: radial-gradient(circle, rgba(188, 19, 254, 0.8) 0%, rgba(188, 19, 254, 0) 70%);
+      position: absolute;
+      left: 50%;
+      top: 46%;
+      transform: translate(-50%, -50%);
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, rgba(188, 19, 254, 0.65) 0%, rgba(188, 19, 254, 0.25) 48%, rgba(188, 19, 254, 0) 75%);
       border-radius: 50%;
-      margin-top: -10px;
-      filter: blur(5px);
+      filter: blur(10px);
+      z-index: 9;
+      pointer-events: none;
       animation: none;
     }
 
@@ -195,7 +201,7 @@
     </nav>
 
     <header class="pixel-border bg-arcade-bg p-4 text-center relative mt-6">
-      <div class="absolute -top-20 -right-4 z-20 glow-cat cursor-pointer group">
+      <div class="absolute -top-12 -right-4 z-20 glow-cat cursor-pointer group">
         <div class="absolute -top-12 -left-20 bg-arcade-dark border-2 border-arcade-purple p-2 text-xs hidden group-hover:block w-32 text-center z-30 font-vt323 text-white shadow-[0_0_10px_#BC13FE]">
           "Meow. Let's build something cool."
         </div>
@@ -253,9 +259,9 @@
         <span class="text-arcade-purple font-press-start text-xs">]</span>
       </a>
 
-      <a href="https://github.com/alanl7l7/" target="_blank" rel="noreferrer" class="pixel-border-dark p-3 text-xl uppercase transition-all flicker-hover flex items-center justify-between bg-arcade-bg">
+      <a href="https://alanl7l7.github.io/" target="_blank" rel="noreferrer" class="pixel-border-dark p-3 text-xl uppercase transition-all flicker-hover flex items-center justify-between bg-arcade-bg">
         <span class="text-arcade-purple font-press-start text-xs">03</span>
-        <span>GitHub_Repo</span>
+        <span>GitHub</span>
         <span class="text-arcade-purple font-press-start text-xs">]</span>
       </a>
 
