@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Player 1 - Digital Namecard</title>
+  <title>Player 1 - Contact Card</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-  
+
   <script>
     tailwind.config = {
       theme: {
@@ -31,6 +31,10 @@
   </script>
 
   <style>
+    :root {
+      --neon-purple: #bc13fe;
+    }
+
     body {
       background-color: #050505;
       color: #FFFFFF;
@@ -39,12 +43,12 @@
 
     .scanlines {
       background: linear-gradient(
-        rgba(18, 16, 16, 0) 50%, 
+        rgba(18, 16, 16, 0) 50%,
         rgba(0, 0, 0, 0.25) 50%
       ), linear-gradient(
-        90deg, 
-        rgba(255, 0, 0, 0.06), 
-        rgba(0, 255, 0, 0.02), 
+        90deg,
+        rgba(255, 0, 0, 0.06),
+        rgba(0, 255, 0, 0.02),
         rgba(0, 0, 255, 0.06)
       );
       background-size: 100% 4px, 3px 100%;
@@ -67,40 +71,12 @@
     .neon-text {
       text-shadow: 0 0 5px #BC13FE, 0 0 10px #BC13FE;
     }
-    
+
     .neon-text-blue {
       text-shadow: 0 0 5px #00FFFF, 0 0 10px #00FFFF;
     }
 
-    .profile-pic {
-      image-rendering: pixelated;
-      filter: grayscale(100%) sepia(100%) hue-rotate(250deg) saturate(300%) brightness(0.5);
-      transition: filter 0.3s ease;
-    }
-
-    .profile-pic:hover {
-      filter: grayscale(0%) sepia(0%);
-    }
-
-    .health-bar-container {
-      border: 4px solid #1A1A1A;
-      background: #000;
-      padding: 2px;
-    }
-
-    .health-bar-fill {
-      background-color: #BC13FE;
-      height: 16px;
-      box-shadow: 0 0 10px #BC13FE;
-    }
-
-    @keyframes flicker {
-      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
-      20%, 24%, 55% { opacity: 0.5; }
-    }
-
     .flicker-hover:hover {
-      animation: flicker 0.15s infinite;
       background-color: #BC13FE;
       color: #fff;
       box-shadow: 0 0 15px #BC13FE;
@@ -111,242 +87,200 @@
       color: #fff;
     }
 
-    @keyframes pulse-neon {
-      0%, 100% { box-shadow: 0 0 10px #BC13FE, inset 0 0 0 4px rgba(188, 19, 254, 0.3); }
-      50% { box-shadow: 0 0 20px #BC13FE, inset 0 0 0 4px rgba(188, 19, 254, 0.6); }
-    }
-
-    .pulse-btn {
-      animation: pulse-neon 2s infinite;
-    }
-
     @keyframes float {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
+      50% { transform: translateY(-12px); }
     }
-    @keyframes float-slow {
-      0%, 100% { transform: translateY(0) rotate(5deg); }
-      50% { transform: translateY(-10px) rotate(-5deg); }
-    }
+
     @keyframes pulse-eye {
       0%, 100% { fill: #FFCC00; }
       50% { fill: #FFFFAA; }
     }
 
-    .animate-float { animation: float 4s ease-in-out infinite; }
-    .animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
-    .delay-1000 { animation-delay: 1s; }
-    .delay-2000 { animation-delay: 2s; }
-    .eye-pulse { animation: pulse-eye 3s infinite; }
+    .character-card {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+    }
 
-    .glow-crystal { filter: drop-shadow(0 0 12px #BC13FE) drop-shadow(0 0 25px #BC13FE); }
-    .glow-sword { filter: drop-shadow(0 0 10px #00FFFF) drop-shadow(0 0 20px #00FFFF); }
-    .glow-cat { filter: drop-shadow(0 0 8px rgba(188,19,254,0.3)); }
-    
-    /* CRT Flicker */
+    .sprite-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cat-sprite {
+      width: 150px;
+      height: auto;
+      z-index: 10;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 0 15px rgba(188, 19, 254, 0.6));
+      animation: none;
+    }
+
+    .floor-glow {
+      width: 100px;
+      height: 20px;
+      background: radial-gradient(circle, rgba(188, 19, 254, 0.8) 0%, rgba(188, 19, 254, 0) 70%);
+      border-radius: 50%;
+      margin-top: -10px;
+      filter: blur(5px);
+      animation: none;
+    }
+
+    @keyframes cat-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    @keyframes shadow-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.4; }
+      50% { transform: scale(0.7); opacity: 0.2; }
+    }
+
+    .animate-float { animation: float 4s ease-in-out infinite; }
+    .delay-1000 { animation-delay: 1s; }
+    .glow-crystal { filter: drop-shadow(0 0 10px #BC13FE) drop-shadow(0 0 20px #BC13FE); }
+    .glow-cat { filter: drop-shadow(0 0 8px rgba(188,19,254,0.35)); }
+
+    .crt-effect {
+      animation: crt-flicker 0.15s infinite;
+    }
+
     @keyframes crt-flicker {
       0% { opacity: 0.95; }
       5% { opacity: 0.85; }
       10% { opacity: 0.95; }
       100% { opacity: 1; }
     }
-    .crt-effect {
-      animation: crt-flicker 0.15s infinite;
-    }
   </style>
 </head>
 <body class="min-h-screen relative overflow-x-hidden flex justify-center p-4 crt-effect">
-  
-  <!-- Scanlines Overlay -->
   <div class="scanlines"></div>
 
-  <!-- Background Floating Crystals -->
   <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden max-w-md mx-auto">
-    <!-- Large Crystal Cluster Top Left -->
-    <div class="absolute top-[10%] -left-8 animate-float glow-crystal opacity-80 w-32 h-32">
+    <div class="absolute top-[8%] -left-7 animate-float glow-crystal opacity-80 w-24 h-24">
       <svg width="100%" height="100%" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="shape-rendering: crispEdges;">
-        <!-- Center Large Crystal -->
         <path fill="#5A00CC" d="M14 4h4v24h-4z M12 8h8v18h-8z M16 2h2v2h-2z"/>
         <path fill="#9D00FF" d="M14 5h2v22h-2z M13 9h1v16h-1z"/>
         <path fill="#E066FF" d="M14 6h1v18h-1z"/>
-        <!-- Left Medium Crystal -->
         <path fill="#3A0088" d="M6 14h6v14H6z M8 10h2v4H8z"/>
         <path fill="#7B00FF" d="M7 15h3v12H7z M8 12h1v3H8z"/>
         <path fill="#D400FF" d="M7 16h1v9H7z"/>
-        <!-- Right Small Crystal -->
         <path fill="#2A0066" d="M20 16h6v12h-6z M22 13h2v3h-2z"/>
         <path fill="#6A00E6" d="M21 17h3v10h-3z M22 14h1v3h-1z"/>
         <path fill="#C400FF" d="M21 18h1v7h-1z"/>
-        <!-- Far Left Tiny Crystal -->
-        <path fill="#4A00AA" d="M2 20h4v8H2z M3 18h2v2H3z"/>
-        <path fill="#9D00FF" d="M3 21h2v6H3z"/>
-        <path fill="#E066FF" d="M3 22h1v4H3z"/>
       </svg>
     </div>
 
-    <!-- Medium Crystal Cluster Bottom Right -->
-    <div class="absolute bottom-[15%] -right-4 animate-float delay-1000 glow-crystal opacity-90 w-24 h-24">
+    <div class="absolute bottom-[13%] -right-5 animate-float delay-1000 glow-crystal opacity-90 w-20 h-20">
       <svg width="100%" height="100%" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="shape-rendering: crispEdges;">
-        <!-- Center Large Crystal -->
         <path fill="#5A00CC" d="M14 4h4v24h-4z M12 8h8v18h-8z M16 2h2v2h-2z"/>
         <path fill="#9D00FF" d="M14 5h2v22h-2z M13 9h1v16h-1z"/>
         <path fill="#E066FF" d="M14 6h1v18h-1z"/>
-        <!-- Left Medium Crystal -->
         <path fill="#3A0088" d="M6 14h6v14H6z M8 10h2v4H8z"/>
         <path fill="#7B00FF" d="M7 15h3v12H7z M8 12h1v3H8z"/>
         <path fill="#D400FF" d="M7 16h1v9H7z"/>
-        <!-- Right Small Crystal -->
-        <path fill="#2A0066" d="M20 16h6v12h-6z M22 13h2v3h-2z"/>
-        <path fill="#6A00E6" d="M21 17h3v10h-3z M22 14h1v3h-1z"/>
-        <path fill="#C400FF" d="M21 18h1v7h-1z"/>
       </svg>
     </div>
   </div>
 
-  <!-- Main Container - Mobile sized -->
-  <div class="w-full max-w-[390px] z-10 flex flex-col gap-6 mt-16 mb-20 relative">
+  <main class="w-full max-w-[390px] z-10 flex flex-col gap-4 mt-10 mb-16">
     <nav class="pixel-border-dark bg-arcade-bg p-2 flex items-center justify-between">
       <a href="index.html" class="font-press-start text-[10px] text-arcade-purple hover:text-white transition-colors">HOME</a>
       <span class="font-press-start text-[10px] text-arcade-blue neon-text-blue">CONTACT HUB</span>
-      <a href="contact-card.html" class="font-press-start text-[10px] text-arcade-purple hover:text-white transition-colors">CONTACT</a>
+      <a href="contact.vcf" download class="font-press-start text-[10px] text-arcade-purple hover:text-white transition-colors">SAVE VCF</a>
     </nav>
-    
-    <!-- Header / Player Card -->
-    <div class="pixel-border bg-arcade-bg p-4 flex flex-col items-center gap-4 relative mt-8">
-      
-      <!-- Shadow Feline (Detailed Cat) -->
-      <div class="absolute -top-16 right-4 z-20 glow-cat cursor-pointer group w-20 h-20">
-        <div class="absolute -top-12 -left-20 bg-arcade-dark border-2 border-arcade-purple p-2 text-xs hidden group-hover:block w-36 text-center z-30 font-vt323 text-white shadow-[0_0_10px_#BC13FE]">
-          "Mana levels optimal."
+
+    <header class="pixel-border bg-arcade-bg p-4 text-center relative mt-6">
+      <div class="absolute -top-20 -right-4 z-20 glow-cat cursor-pointer group">
+        <div class="absolute -top-12 -left-20 bg-arcade-dark border-2 border-arcade-purple p-2 text-xs hidden group-hover:block w-32 text-center z-30 font-vt323 text-white shadow-[0_0_10px_#BC13FE]">
+          "Meow. Let's build something cool."
         </div>
-        <svg width="100%" height="100%" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="shape-rendering: crispEdges;">
-          <!-- Tail -->
-          <path fill="#0A0A0F" d="M16 16h4v2h-4z M18 14h2v2h-2z M19 12h2v2h-2z"/>
-          <!-- Back/Body -->
-          <path fill="#15151A" d="M6 10h12v10H6z M5 12h14v7H5z M4 14h16v4H4z"/>
-          <!-- Head -->
-          <path fill="#15151A" d="M7 4h10v7H7z M6 6h12v4H6z"/>
-          <!-- Ears -->
-          <path fill="#15151A" d="M7 2h2v2H7z M8 1h1v1H8z M15 2h2v2h-2z M15 1h1v1h-1z"/>
-          <path fill="#2A2A35" d="M8 3h1v2H8z M15 3h1v2h-1z"/>
-          <!-- Eyes (Big and glowing) -->
-          <path fill="#FF6600" d="M7 7h4v4H7z M13 7h4v4h-4z"/>
-          <path fill="#FFCC00" class="eye-pulse" d="M8 8h2v2H8z M14 8h2v2h-2z"/>
-          <path fill="#000000" d="M9 7h1v3H9z M15 7h1v3h-1z"/>
-          <path fill="#FFFFFF" d="M8 7h1v1H8z M14 7h1v1h-1z"/>
-          <!-- Nose -->
-          <path fill="#000000" d="M11 11h2v1h-2z"/>
-          <!-- Paws -->
-          <path fill="#0A0A0F" d="M7 19h3v2H7z M12 19h3v2h-3z"/>
-        </svg>
+        <div class="character-card">
+          <div class="sprite-container">
+            <img src="assets/Cat.svg" alt="Void Cat" class="cat-sprite">
+            <div class="floor-glow"></div>
+          </div>
+        </div>
       </div>
 
-      <h1 class="font-press-start text-xl neon-text text-center mt-2">PLAYER 1</h1>
-      
-      <div class="w-32 h-32 pixel-border-dark overflow-hidden relative group cursor-pointer">
-        <div class="absolute inset-0 bg-arcade-purple opacity-20 hover:opacity-0 transition-opacity z-10 pointer-events-none"></div>
-        <img 
-          src="https://picsum.photos/seed/cyberpunk/200/200" 
-          alt="Profile" 
-          class="w-full h-full object-cover profile-pic"
-        />
-      </div>
-    </div>
+      <p class="font-press-start text-xs text-arcade-blue neon-text-blue mb-2">TRANSMISSION</p>
+      <h1 class="font-press-start text-lg neon-text">CONTACT CARD</h1>
+      <p class="text-xl mt-2">Alan "Player" Lee</p>
+    </header>
 
-    <!-- Stats / Info -->
-    <div class="pixel-border-dark p-4 bg-arcade-bg flex flex-col gap-4 relative">
-      
-      <!-- Ethereal Broadsword (Detailed) -->
-      <div class="absolute -left-12 top-1/2 -translate-y-1/2 z-20 glow-sword animate-float-slow pointer-events-none w-28 h-36">
-        <svg width="100%" height="100%" viewBox="0 0 24 32" xmlns="http://www.w3.org/2000/svg" style="shape-rendering: crispEdges; transform: rotate(-30deg);">
-          <!-- Glow -->
-          <path fill="#00FFFF" opacity="0.2" d="M10 2h4v20h-4z M11 0h2v2h-2z M8 6h8v14H8z"/>
-          <!-- Blade Base -->
-          <path fill="#00BFFF" d="M11 2h2v18h-2z M10 4h4v15h-4z"/>
-          <!-- Blade Core -->
-          <path fill="#E0FFFF" d="M11 3h2v16h-2z"/>
-          <path fill="#FFFFFF" d="M11 4h1v14h-1z"/>
-          <!-- Crossguard -->
-          <path fill="#1A1A24" d="M6 20h12v4H6z M4 21h16v2H4z"/>
-          <path fill="#2A2A35" d="M7 20h10v2H7z M5 21h14v1H5z"/>
-          <path fill="#00FFFF" opacity="0.6" d="M11 21h2v2h-2z"/> <!-- Center Gem -->
-          <!-- Handle -->
-          <path fill="#2A1A10" d="M10 24h4v6h-4z"/>
-          <path fill="#1A0A00" d="M11 24h2v6h-2z"/>
-          <!-- Pommel -->
-          <path fill="#1A1A24" d="M9 30h6v2H9z"/>
-          <path fill="#2A2A35" d="M10 30h4v1h-4z"/>
-        </svg>
+    <section class="pixel-border-dark bg-arcade-bg p-4 flex flex-col gap-3">
+      <div>
+        <h2 class="font-press-start text-xs text-arcade-purple mb-1">NAME</h2>
+        <p class="text-2xl uppercase">Alan Lee</p>
       </div>
-
-      <div class="pl-8">
-        <h2 class="font-press-start text-sm text-arcade-purple mb-1">NAME</h2>
-        <p class="text-2xl uppercase">Alex "Cipher" Chen</p>
+      <div>
+        <h2 class="font-press-start text-xs text-arcade-purple mb-1">ROLE</h2>
+        <p class="text-xl uppercase">Solution Architect / Full-Stack Mage</p>
       </div>
-      <div class="pl-8">
-        <h2 class="font-press-start text-sm text-arcade-purple mb-1">CLASS</h2>
-        <p class="text-xl uppercase">Netrunner / Dev</p>
-      </div>
-      
-      <div class="mt-2 pl-8">
+      <div>
         <div class="flex justify-between font-press-start text-[10px] mb-1">
-          <span>MANA LEVEL</span>
-          <span class="text-arcade-blue neon-text-blue">MAX</span>
+          <span>BUILD STATUS</span>
+          <span class="text-arcade-blue neon-text-blue">ONLINE</span>
         </div>
-        <div class="health-bar-container border-arcade-blue">
-          <div class="health-bar-fill w-full bg-arcade-blue shadow-[0_0_10px_#00FFFF]"></div>
+        <div class="pixel-border-dark p-1 bg-black">
+          <div class="h-4 w-full bg-arcade-blue shadow-[0_0_10px_#00FFFF]"></div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Lore / Environment Box -->
-    <div class="pixel-border-dark p-3 bg-arcade-bg text-sm text-gray-300 leading-relaxed">
-      <p><span class="text-arcade-purple font-press-start text-[8px]">LOC:</span> Crystalline Deep, Sector 7G.</p>
-      <p><span class="text-arcade-purple font-press-start text-[8px]">FAMILIAR:</span> Shadow Feline.</p>
-      <p><span class="text-arcade-blue font-press-start text-[8px]">ARTIFACT:</span> Ethereal Broadsword (Pulse Blue).</p>
-    </div>
+    <section class="pixel-border-dark p-3 bg-arcade-bg text-sm text-gray-300 leading-relaxed">
+      <p><span class="text-arcade-purple font-press-start text-[8px]">LOCATION:</span> Earth (Mostly).</p>
+      <p><span class="text-arcade-purple font-press-start text-[8px]">MODE:</span> Building solutions before polishing syntax.</p>
+      <p><span class="text-arcade-blue font-press-start text-[8px]">STATUS:</span> Ready to ship code.</p>
+    </section>
 
-    <!-- Inventory / Links -->
-    <div class="flex flex-col gap-3">
-      <h2 class="font-press-start text-sm text-center mb-2 neon-text">>> INVENTORY &lt;&lt;</h2>
+    <section class="pixel-border-dark bg-arcade-bg p-4 flex flex-col gap-3">
+      <h2 class="font-press-start text-xs text-arcade-purple">DIRECT CHANNELS</h2>
 
-      <a href="contact-card.html" class="pixel-border p-3 text-center text-xl uppercase transition-all flicker-hover flex items-center justify-between group bg-arcade-bg">
-        <span class="text-arcade-purple font-press-start text-xs">00</span>
-        <span>Contact_Card</span>
+      <a href="mailto:leeleongl7l7@gmail.com" class="pixel-border-dark p-3 text-xl uppercase transition-all flicker-hover flex items-center justify-between bg-arcade-bg">
+        <span class="text-arcade-purple font-press-start text-xs">01</span>
+        <span>Email_Link</span>
         <span class="text-arcade-purple font-press-start text-xs">]</span>
       </a>
-      
-      <a href="https://github.com" target="_blank" rel="noreferrer" class="pixel-border-dark p-3 text-center text-xl uppercase transition-all flicker-hover flex items-center justify-between group bg-arcade-bg">
-        <span class="text-arcade-purple font-press-start text-xs">01</span>
+
+      <a href="https://wa.me/601112284988?text=Hi" target="_blank" rel="noreferrer" class="pixel-border-dark p-3 text-xl uppercase transition-all flicker-hover flex items-center justify-between bg-arcade-bg">
+        <span class="text-arcade-purple font-press-start text-xs">02</span>
+        <span>Whats@pp</span>
+        <span class="text-arcade-purple font-press-start text-xs">]</span>
+      </a>
+
+      <a href="https://github.com/alanl7l7/" target="_blank" rel="noreferrer" class="pixel-border-dark p-3 text-xl uppercase transition-all flicker-hover flex items-center justify-between bg-arcade-bg">
+        <span class="text-arcade-purple font-press-start text-xs">03</span>
         <span>GitHub_Repo</span>
         <span class="text-arcade-purple font-press-start text-xs">]</span>
       </a>
-      
-      <a href="https://twitter.com" target="_blank" rel="noreferrer" class="pixel-border-dark p-3 text-center text-xl uppercase transition-all flicker-hover flex items-center justify-between group bg-arcade-bg">
-        <span class="text-arcade-purple font-press-start text-xs">02</span>
-        <span>Comms_Link</span>
+
+      <a href="https://www.linkedin.com/in/alan-lee-56280725a/" target="_blank" rel="noreferrer" class="pixel-border-dark p-3 text-xl uppercase transition-all flicker-hover flex items-center justify-between bg-arcade-bg">
+        <span class="text-arcade-purple font-press-start text-xs">04</span>
+        <span>Linked!N</span>
         <span class="text-arcade-purple font-press-start text-xs">]</span>
       </a>
 
-      <a href="https://linkedin.com" target="_blank" rel="noreferrer" class="pixel-border-dark p-3 text-center text-xl uppercase transition-all flicker-hover flex items-center justify-between group bg-arcade-bg">
-        <span class="text-arcade-purple font-press-start text-xs">03</span>
-        <span>LinkedIN</span>
-        <span class="text-arcade-purple font-press-start text-xs">]</span>
+      <a href="contact.vcf" download class="pixel-border p-3 text-center font-press-start text-xs neon-text hover:bg-arcade-purple transition-colors">
+        DOWNLOAD CONTACT .VCF
       </a>
-    </div>
+    </section>
 
-    <!-- Save Contact -->
-    <div class="mt-4">
-      <a 
-        href="contact.vcf" 
-        download
-        class="block w-full pixel-border bg-arcade-bg p-4 text-center font-press-start text-sm neon-text pulse-btn hover:bg-arcade-purple hover:text-white transition-colors"
-      >
-        INSERT COIN TO<br><br>SAVE PLAYER DATA
+    <section class="pixel-border-dark bg-arcade-bg p-4">
+      <h2 class="font-press-start text-xs text-arcade-blue neon-text-blue mb-2">STATUS</h2>
+      <p class="text-lg">Mobile-ready HUD profile card for quick sharing.</p>
+      <p class="text-lg">All links are relative and GitHub Pages-safe.</p>
+    </section>
+
+    <nav class="flex flex-col gap-2 mt-2">
+      <a href="index.html" class="pixel-border-dark p-3 text-center text-xl uppercase transition-all flicker-hover bg-arcade-bg">
+        Return_To_Main
       </a>
-    </div>
-
-  </div>
-
+    </nav>
+  </main>
 </body>
 </html>
