@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player 1 - Contact Card</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            arcade: {
+              bg: '#050505',
+              purple: '#BC13FE',
+              dark: '#1A1A1A',
+              blue: '#00FFFF'
+            }
+          },
+          fontFamily: {
+            'press-start': ['"Press Start 2P"', 'cursive'],
+            'vt323': ['"VT323"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #050505;
+      color: #FFFFFF;
+      font-family: 'VT323', monospace;
+    }
+
+    .scanlines {
+      background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%,
+        rgba(0, 0, 0, 0.25) 50%
+      ), linear-gradient(
+        90deg,
+        rgba(255, 0, 0, 0.06),
+        rgba(0, 255, 0, 0.02),
+        rgba(0, 0, 255, 0.06)
+      );
+      background-size: 100% 4px, 3px 100%;
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+    }
+
+    .pixel-border {
+      border: 4px solid #BC13FE;
+      box-shadow: inset 0 0 0 4px rgba(188, 19, 254, 0.3), 0 0 10px #BC13FE;
+    }
+
+    .pixel-border-dark {
+      border: 4px solid #1A1A1A;
+      box-shadow: inset 0 0 0 4px rgba(26, 26, 26, 0.5);
+    }
+
+    .neon-text {
+      text-shadow: 0 0 5px #BC13FE, 0 0 10px #BC13FE;
+    }
+
+    .neon-text-blue {
+      text-shadow: 0 0 5px #00FFFF, 0 0 10px #00FFFF;
+    }
+
+    .flicker-hover:hover {
+      background-color: #BC13FE;
+      color: #fff;
+      box-shadow: 0 0 15px #BC13FE;
+      border-color: #BC13FE;
+    }
+
+    .flicker-hover:hover .text-arcade-purple {
+      color: #fff;
+    }
+
+    .crt-effect {
+      animation: crt-flicker 0.15s infinite;
+    }
+
+    @keyframes crt-flicker {
+      0% { opacity: 0.95; }
+      5% { opacity: 0.85; }
+      10% { opacity: 0.95; }
+      100% { opacity: 1; }
+    }
+  </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden flex justify-center p-4 crt-effect">
+  <div class="scanlines"></div>
+
+  <main class="w-full max-w-[390px] z-10 flex flex-col gap-4 mt-10 mb-16">
+    <nav class="pixel-border-dark bg-arcade-bg p-2 flex items-center justify-between">
+      <a href="index.html" class="font-press-start text-[10px] text-arcade-purple hover:text-white transition-colors">HOME</a>
+      <span class="font-press-start text-[10px] text-arcade-blue neon-text-blue">CONTACT HUB</span>
+      <a href="contact.vcf" download class="font-press-start text-[10px] text-arcade-purple hover:text-white transition-colors">SAVE VCF</a>
+    </nav>
+
+    <header class="pixel-border bg-arcade-bg p-4 text-center">
+      <p class="font-press-start text-xs text-arcade-blue neon-text-blue mb-2">TRANSMISSION</p>
+      <h1 class="font-press-start text-lg neon-text">CONTACT CARD</h1>
+      <p class="text-xl mt-2">Alex "Cipher" Chen</p>
+    </header>
+
+    <section class="pixel-border-dark bg-arcade-bg p-4 flex flex-col gap-3">
+      <div>
+        <h2 class="font-press-start text-xs text-arcade-purple mb-1">NAME</h2>
+        <p class="text-2xl uppercase">Alex "Cipher" Chen</p>
+      </div>
+      <div>
+        <h2 class="font-press-start text-xs text-arcade-purple mb-1">CLASS</h2>
+        <p class="text-xl uppercase">Netrunner / Dev</p>
+      </div>
+      <div>
+        <div class="flex justify-between font-press-start text-[10px] mb-1">
+          <span>MANA LEVEL</span>
+          <span class="text-arcade-blue neon-text-blue">MAX</span>
+        </div>
+        <div class="pixel-border-dark p-1 bg-black">
+          <div class="h-4 w-full bg-arcade-blue shadow-[0_0_10px_#00FFFF]"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pixel-border-dark p-3 bg-arcade-bg text-sm text-gray-300 leading-relaxed">
+      <p><span class="text-arcade-purple font-press-start text-[8px]">LOC:</span> Crystalline Deep, Sector 7G.</p>
+      <p><span class="text-arcade-purple font-press-start text-[8px]">FAMILIAR:</span> Shadow Feline.</p>
+      <p><span class="text-arcade-blue font-press-start text-[8px]">ARTIFACT:</span> Ethereal Broadsword (Pulse Blue).</p>
+    </section>
+
+    <section class="pixel-border-dark bg-arcade-bg p-4 flex flex-col gap-3">
+      <h2 class="font-press-start text-xs text-arcade-purple">DIRECT CHANNELS</h2>
+
+      <a href="mailto:alanleehl000@gmail.com" class="pixel-border-dark p-3 text-xl uppercase transition-all flicker-hover flex items-center justify-between bg-arcade-bg">
+        <span class="text-arcade-purple font-press-start text-xs">01</span>
+        <span>Home_Mail</span>
+        <span class="text-arcade-purple font-press-start text-xs">]</span>
+      </a>
+
+      <a href="mailto:leeleongl7l7@gmail.com" class="pixel-border-dark p-3 text-xl uppercase transition-all flicker-hover flex items-center justify-between bg-arcade-bg">
+        <span class="text-arcade-purple font-press-start text-xs">02</span>
+        <span>Work_Mail</span>
+        <span class="text-arcade-purple font-press-start text-xs">]</span>
+      </a>
+
+      <a href="tel:+601112284988" class="pixel-border-dark p-3 text-xl uppercase transition-all flicker-hover flex items-center justify-between bg-arcade-bg">
+        <span class="text-arcade-purple font-press-start text-xs">03</span>
+        <span>Voice_Comms</span>
+        <span class="text-arcade-purple font-press-start text-xs">]</span>
+      </a>
+
+      <a href="https://www.linkedin.com/in/alan-lee-56280725a/" target="_blank" rel="noreferrer" class="pixel-border-dark p-3 text-xl uppercase transition-all flicker-hover flex items-center justify-between bg-arcade-bg">
+        <span class="text-arcade-purple font-press-start text-xs">04</span>
+        <span>Neural_Net</span>
+        <span class="text-arcade-purple font-press-start text-xs">]</span>
+      </a>
+
+      <a href="contact.vcf" download class="pixel-border p-3 text-center font-press-start text-xs neon-text hover:bg-arcade-purple transition-colors">
+        DOWNLOAD CONTACT .VCF
+      </a>
+    </section>
+
+    <section class="pixel-border-dark bg-arcade-bg p-4">
+      <h2 class="font-press-start text-xs text-arcade-blue neon-text-blue mb-2">STATUS</h2>
+      <p class="text-lg">Mobile-ready HUD profile card for quick sharing.</p>
+      <p class="text-lg">All links are relative and GitHub Pages-safe.</p>
+    </section>
+
+    <nav class="flex flex-col gap-2 mt-2">
+      <a href="index.html" class="pixel-border-dark p-3 text-center text-xl uppercase transition-all flicker-hover bg-arcade-bg">
+        Return_To_Main
+      </a>
+    </nav>
+  </main>
+</body>
+</html>
