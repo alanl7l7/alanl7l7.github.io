@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Alan Lee - Solution Architect &amp; Full-Stack Engineer. Interactive Retro Terminal &amp; Clean Resume Portfolio.">
+    <meta property="og:title" content="Alan Lee // Solution Architect &amp; Full-Stack Engineer">
+    <meta property="og:description" content="Interactive Retro Terminal &amp; Clean Resume Portfolio by Alan Lee.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d0d0d'/><text x='15' y='70' font-family='monospace' font-weight='bold' font-size='60' fill='%2333ff33'>&gt;_</text></svg>">
     <title>Alan // Insert Coin</title>
     <style>
         :root {
@@ -544,19 +549,26 @@
             color: var(--input-placeholder);
         }
 
-        .blinking-cursor,
-        ::-webkit-scrollbar-thumb {
+        .blinking-cursor {
             background: var(--accent);
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
         }
 
         ::-webkit-scrollbar-track {
             background: var(--bg-main);
-            border-left-color: var(--accent);
+            border-left: 1px solid var(--accent-dim);
         }
 
-        ::-webkit-scrollbar { width: 12px; }
-        ::-webkit-scrollbar-track { background: #0d0d0d; border-left: 2px solid #33ff33; }
-        ::-webkit-scrollbar-thumb { background: #33ff33; }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--warn);
+        }
 
         @media (max-width: 900px) {
             body, html {
@@ -1628,8 +1640,22 @@
       
     <!-- 3. JAVASCRIPT LOGIC -->
     <script>
-        // --- ADD THIS BLOCK: 8-Bit Audio Synthesizer ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // --- 8-BIT AUDIO SYNTHESIZER (LAZY INITIALIZATION) ---
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) {
+                    audioCtx = new AudioContextClass();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
         const terminalLog = [];
         const terminalMaxLines = 2;
         let hudExpRaw = 740;
@@ -1697,7 +1723,7 @@
         let cheatUnlocked = false;
         let audioEnabled = true;
 
-        // --- MATRIX RAIN LOGIC ---
+        // --- OPTIMIZED MATRIX RAIN LOGIC (requestAnimationFrame) ---
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         
@@ -1710,18 +1736,17 @@
         const alphabet = katakana + latin + nums;
 
         const fontSize = 16;
-        let columns = canvas.width / fontSize;
-        let drops = [];
+        let columns = Math.floor(canvas.width / fontSize);
+        let drops = new Array(columns).fill(1);
 
-        for (let x = 0; x < columns; x++) {
-            drops[x] = 1;
-        }
+        let matrixRunning = true;
+        let lastMatrixFrame = 0;
+        const matrixFpsInterval = 1000 / 30; // 30 FPS target
 
         function drawMatrix() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Get current theme color for rain
             const rootStyles = getComputedStyle(document.documentElement);
             const rainColor = rootStyles.getPropertyValue('--accent').trim() || '#33ff33';
             
@@ -1739,63 +1764,111 @@
             }
         }
 
+        function matrixLoop(timestamp) {
+            if (!matrixRunning) return;
+            requestAnimationFrame(matrixLoop);
+
+            const elapsed = timestamp - lastMatrixFrame;
+            if (elapsed >= matrixFpsInterval) {
+                lastMatrixFrame = timestamp - (elapsed % matrixFpsInterval);
+                drawMatrix();
+            }
+        }
+
+        function startMatrix() {
+            if (!matrixRunning) {
+                matrixRunning = true;
+                lastMatrixFrame = performance.now();
+                requestAnimationFrame(matrixLoop);
+            }
+        }
+
+        function stopMatrix() {
+            matrixRunning = false;
+        }
+
+        // Initialize animation loop
+        requestAnimationFrame(matrixLoop);
+
+        // Debounced resize handler to save CPU
+        let resizeTimer = null;
         window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            columns = canvas.width / fontSize;
-            drops = [];
-            for (let x = 0; x < columns; x++) {
-                drops[x] = 1;
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                columns = Math.floor(canvas.width / fontSize);
+                drops = new Array(columns).fill(1);
+            }, 120);
+        });
+
+        // Pause animation when tab is in background
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopMatrix();
+            } else {
+                const resumeEl = document.getElementById('clean-resume-view');
+                if (!resumeEl || !resumeEl.classList.contains('active')) {
+                    startMatrix();
+                }
             }
         });
 
-        setInterval(drawMatrix, 30);
-        // -------------------------
-
         function play8BitClick() {
             if (!audioEnabled) return;
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            
-            osc.type = 'square'; // 'square' = classic Nintendo/Arcade sound
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime); // High pitch blip
-            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05); // Quick drop
-            
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime); // 10% volume (so it isn't deafening)
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05); // Fast fade out
-            
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.05); // Lasts exactly 50 milliseconds
+            const aCtx = getAudioContext();
+            if (!aCtx) return;
+
+            try {
+                const osc = aCtx.createOscillator();
+                const gain = aCtx.createGain();
+                
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(600, aCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, aCtx.currentTime + 0.05);
+                
+                gain.gain.setValueAtTime(0.1, aCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, aCtx.currentTime + 0.05);
+                
+                osc.connect(gain);
+                gain.connect(aCtx.destination);
+                osc.start();
+                osc.stop(aCtx.currentTime + 0.05);
+            } catch (err) {
+                // Ignore audio policy errors
+            }
         }
 
         function playVictorySound() {
             if (!audioEnabled) return;
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const aCtx = getAudioContext();
+            if (!aCtx) return;
 
-            const notes = [523.25, 659.25, 783.99, 1046.5];
-            const start = audioCtx.currentTime;
+            try {
+                const notes = [523.25, 659.25, 783.99, 1046.5];
+                const start = aCtx.currentTime;
 
-            notes.forEach((freq, i) => {
-                const t = start + i * 0.12;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
+                notes.forEach((freq, i) => {
+                    const t = start + i * 0.12;
+                    const osc = aCtx.createOscillator();
+                    const gain = aCtx.createGain();
 
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(freq, t);
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(freq, t);
 
-                gain.gain.setValueAtTime(0.0001, t);
-                gain.gain.exponentialRampToValueAtTime(0.08, t + 0.01);
-                gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.11);
+                    gain.gain.setValueAtTime(0.0001, t);
+                    gain.gain.exponentialRampToValueAtTime(0.08, t + 0.01);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.11);
 
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
+                    osc.connect(gain);
+                    gain.connect(aCtx.destination);
 
-                osc.start(t);
-                osc.stop(t + 0.12);
-            });
+                    osc.start(t);
+                    osc.stop(t + 0.12);
+                });
+            } catch (err) {
+                // Ignore audio policy errors
+            }
         }
 
         function normalizeKey(key) {
@@ -1919,6 +1992,9 @@
             }, 1800);
         }
 
+        const cmdHistory = [];
+        let cmdHistoryIndex = -1;
+
         function runCommand(rawValue) {
             const command = rawValue.trim().toLowerCase();
             if (!command) return;
@@ -1930,7 +2006,7 @@
                 return;
             }
 
-            if (command === 'ls') {
+            if (command === 'ls' || command === 'dir') {
                 setCmdOutput('> about_me/  projects/  skill_tree/  inventory/  resume/  display_settings/');
                 return;
             }
@@ -1984,7 +2060,7 @@
                 return;
             }
 
-            if (command === 'clear') {
+            if (command === 'clear' || command === 'cls') {
                 terminalLog.length = 0;
                 const cmdText = document.getElementById('cmd-text');
                 if (cmdText) {
@@ -2027,6 +2103,7 @@
             if (!resumeEl) return;
 
             if (show) {
+                stopMatrix();
                 resumeEl.classList.add('active');
                 document.body.classList.add('resume-view-open');
                 if (bootScreen) bootScreen.style.display = 'none';
@@ -2034,6 +2111,7 @@
                 window.location.hash = 'resume';
                 setCmdOutput('> Switched to Clean Resume view.');
             } else {
+                startMatrix();
                 resumeEl.classList.remove('active');
                 document.body.classList.remove('resume-view-open');
                 if (window.location.hash === '#resume') {
@@ -2140,10 +2218,47 @@
 
             if (cmdInput) {
                 cmdInput.addEventListener('keydown', (event) => {
+                    if (event.key === 'ArrowUp') {
+                        event.preventDefault();
+                        if (cmdHistory.length > 0) {
+                            if (cmdHistoryIndex === -1) {
+                                cmdHistoryIndex = cmdHistory.length - 1;
+                            } else if (cmdHistoryIndex > 0) {
+                                cmdHistoryIndex--;
+                            }
+                            cmdInput.value = cmdHistory[cmdHistoryIndex] || '';
+                        }
+                        return;
+                    }
+
+                    if (event.key === 'ArrowDown') {
+                        event.preventDefault();
+                        if (cmdHistory.length > 0 && cmdHistoryIndex !== -1) {
+                            if (cmdHistoryIndex < cmdHistory.length - 1) {
+                                cmdHistoryIndex++;
+                                cmdInput.value = cmdHistory[cmdHistoryIndex] || '';
+                            } else {
+                                cmdHistoryIndex = -1;
+                                cmdInput.value = '';
+                            }
+                        }
+                        return;
+                    }
+
                     if (event.key !== 'Enter') return;
 
+                    const rawVal = cmdInput.value;
+                    const trimmed = rawVal.trim();
+                    if (trimmed) {
+                        if (cmdHistory[cmdHistory.length - 1] !== trimmed) {
+                            cmdHistory.push(trimmed);
+                            if (cmdHistory.length > 50) cmdHistory.shift();
+                        }
+                        cmdHistoryIndex = -1;
+                    }
+
                     play8BitClick();
-                    runCommand(cmdInput.value);
+                    runCommand(rawVal);
                     cmdInput.value = '';
                 });
             }
