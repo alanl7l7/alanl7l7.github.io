@@ -688,6 +688,565 @@
                 font-size: 0.85rem;
             }
         }
+
+        /* ===================================================
+           CLEAN RESUME VIEW & TOGGLE STYLES
+        ==================================================== */
+        .hud-resume-btn {
+            background: var(--accent);
+            color: #0d0d0d;
+            border: 2px solid var(--accent);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: bold;
+            padding: 4px 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+
+        .hud-resume-btn:hover {
+            background: var(--warn);
+            border-color: var(--warn);
+            color: #0d0d0d;
+            box-shadow: 0 0 12px rgba(255, 204, 0, 0.7);
+            transform: translateY(-1px);
+        }
+
+        .nav-btn.resume-nav-btn {
+            border-color: rgba(255, 204, 0, 0.4);
+            color: var(--warn);
+            margin-top: 6px;
+            font-weight: bold;
+        }
+
+        .nav-btn.resume-nav-btn:hover {
+            background-color: var(--warn);
+            color: #0d0d0d;
+            border-left-color: var(--warn);
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.35);
+        }
+
+        body.resume-view-open {
+            overflow: auto !important;
+            height: auto !important;
+        }
+
+        body.resume-view-open .crt-overlay {
+            display: none !important;
+        }
+
+        #clean-resume-view {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #f1f5f9;
+            color: #1e293b;
+            z-index: 100000;
+            overflow-y: auto;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        #clean-resume-view.active {
+            display: block;
+            animation: fadeInResume 0.25s ease-out;
+        }
+
+        @keyframes fadeInResume {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #clean-resume-view.dark-mode {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .resume-top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #cbd5e1;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        #clean-resume-view.dark-mode .resume-top-bar {
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom-color: #334155;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .resume-bar-left, .resume-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .resume-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            font-family: inherit;
+        }
+
+        .resume-btn:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+            color: #0f172a;
+        }
+
+        #clean-resume-view.dark-mode .resume-btn {
+            background: #1e293b;
+            border-color: #475569;
+            color: #cbd5e1;
+        }
+
+        #clean-resume-view.dark-mode .resume-btn:hover {
+            background: #334155;
+            color: #ffffff;
+        }
+
+        .resume-btn-primary {
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+        }
+
+        .resume-btn-primary:hover {
+            background: #334155;
+            color: #ffffff;
+        }
+
+        #clean-resume-view.dark-mode .resume-btn-primary {
+            background: #38bdf8;
+            color: #0f172a;
+            border-color: #38bdf8;
+        }
+
+        #clean-resume-view.dark-mode .resume-btn-primary:hover {
+            background: #7dd3fc;
+        }
+
+        .resume-btn-back {
+            background: #002200;
+            color: #33ff33;
+            border: 1px solid #33ff33;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+        }
+
+        .resume-btn-back:hover {
+            background: #33ff33;
+            color: #000000;
+            box-shadow: 0 0 10px rgba(51, 255, 51, 0.4);
+        }
+
+        .resume-wrapper {
+            max-width: 860px;
+            margin: 32px auto 80px;
+            padding: 0 20px;
+        }
+
+        .resume-paper {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 50px 56px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.06);
+            line-height: 1.6;
+        }
+
+        #clean-resume-view.dark-mode .resume-paper {
+            background: #1e293b;
+            border-color: #334155;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+        }
+
+        .resume-header {
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 24px;
+            margin-bottom: 26px;
+        }
+
+        #clean-resume-view.dark-mode .resume-header {
+            border-bottom-color: #334155;
+        }
+
+        .resume-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .resume-name {
+            font-size: 2.3rem;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.15;
+        }
+
+        #clean-resume-view.dark-mode .resume-name {
+            color: #f8fafc;
+        }
+
+        .resume-role {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #0284c7;
+            margin: 6px 0 14px 0;
+        }
+
+        #clean-resume-view.dark-mode .resume-role {
+            color: #38bdf8;
+        }
+
+        .resume-contact-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 22px;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        #clean-resume-view.dark-mode .resume-contact-bar {
+            color: #94a3b8;
+        }
+
+        .resume-contact-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        .resume-contact-item:hover {
+            color: #0284c7;
+            text-decoration: underline;
+        }
+
+        #clean-resume-view.dark-mode .resume-contact-item:hover {
+            color: #38bdf8;
+        }
+
+        .resume-section {
+            margin-bottom: 28px;
+        }
+
+        .resume-section-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #0f172a;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 6px;
+            margin: 0 0 16px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #clean-resume-view.dark-mode .resume-section-title {
+            color: #f1f5f9;
+            border-bottom-color: #334155;
+        }
+
+        .resume-summary-text {
+            font-size: 0.96rem;
+            color: #334155;
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        #clean-resume-view.dark-mode .resume-summary-text {
+            color: #cbd5e1;
+        }
+
+        .resume-skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px 20px;
+        }
+
+        .resume-skill-cat {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 16px;
+        }
+
+        #clean-resume-view.dark-mode .resume-skill-cat {
+            background: #0f172a;
+            border-color: #334155;
+        }
+
+        .resume-skill-label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #0284c7;
+            margin-bottom: 6px;
+        }
+
+        #clean-resume-view.dark-mode .resume-skill-label {
+            color: #38bdf8;
+        }
+
+        .resume-skill-tags {
+            font-size: 0.9rem;
+            color: #334155;
+            line-height: 1.5;
+        }
+
+        #clean-resume-view.dark-mode .resume-skill-tags {
+            color: #cbd5e1;
+        }
+
+        .resume-item {
+            margin-bottom: 20px;
+            break-inside: avoid;
+        }
+
+        .resume-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .resume-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .resume-item-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        #clean-resume-view.dark-mode .resume-item-title {
+            color: #f8fafc;
+        }
+
+        .resume-item-role {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        #clean-resume-view.dark-mode .resume-item-role {
+            color: #94a3b8;
+        }
+
+        .resume-item-stack {
+            font-size: 0.82rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 600;
+            color: #0369a1;
+            background: #e0f2fe;
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin: 3px 0 6px 0;
+        }
+
+        #clean-resume-view.dark-mode .resume-item-stack {
+            color: #7dd3fc;
+            background: #082f49;
+        }
+
+        .resume-item-desc {
+            font-size: 0.92rem;
+            color: #334155;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        #clean-resume-view.dark-mode .resume-item-desc {
+            color: #cbd5e1;
+        }
+
+        .resume-item-bullets {
+            margin: 6px 0 0 18px;
+            padding: 0;
+            font-size: 0.92rem;
+            color: #334155;
+        }
+
+        #clean-resume-view.dark-mode .resume-item-bullets {
+            color: #cbd5e1;
+        }
+
+        .resume-item-bullets li {
+            margin-bottom: 4px;
+            line-height: 1.55;
+        }
+
+        @media print {
+            body, html {
+                background: #ffffff !important;
+                color: #000000 !important;
+                overflow: visible !important;
+                height: auto !important;
+            }
+
+            #main-os,
+            #boot-screen,
+            #matrix-canvas,
+            .crt-overlay,
+            #crash-screen,
+            .resume-top-bar {
+                display: none !important;
+            }
+
+            #clean-resume-view {
+                position: static !important;
+                display: block !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                overflow: visible !important;
+                width: 100% !important;
+                height: auto !important;
+                font-size: 11pt !important;
+            }
+
+            .resume-wrapper {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .resume-paper {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+            }
+
+            .resume-header {
+                border-bottom: 1.5pt solid #333333 !important;
+                padding-bottom: 12pt !important;
+                margin-bottom: 14pt !important;
+            }
+
+            .resume-name {
+                font-size: 20pt !important;
+                color: #000000 !important;
+            }
+
+            .resume-role {
+                font-size: 12pt !important;
+                color: #222222 !important;
+                margin-bottom: 8pt !important;
+            }
+
+            .resume-contact-bar {
+                color: #333333 !important;
+                font-size: 9.5pt !important;
+                gap: 8pt 14pt !important;
+            }
+
+            .resume-section-title {
+                border-bottom: 1pt solid #444444 !important;
+                color: #000000 !important;
+                font-size: 11pt !important;
+                margin-bottom: 8pt !important;
+                padding-bottom: 3pt !important;
+            }
+
+            .resume-skills-grid {
+                gap: 8pt !important;
+            }
+
+            .resume-skill-cat {
+                background: #f9f9f9 !important;
+                border: 0.5pt solid #cccccc !important;
+                padding: 6pt 10pt !important;
+            }
+
+            .resume-item-stack {
+                background: none !important;
+                border: 0.5pt solid #888888 !important;
+                color: #222222 !important;
+                font-size: 8.5pt !important;
+                padding: 1pt 4pt !important;
+            }
+
+            .resume-item {
+                break-inside: avoid !important;
+                margin-bottom: 12pt !important;
+            }
+
+            a {
+                text-decoration: none !important;
+                color: #000000 !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .resume-paper {
+                padding: 24px 18px;
+            }
+
+            .resume-name {
+                font-size: 1.7rem;
+            }
+
+            .resume-role {
+                font-size: 1rem;
+            }
+
+            .resume-contact-bar {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .resume-top-bar {
+                padding: 10px 14px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .resume-bar-left, .resume-bar-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
     </style>
 </head>
 <body>
@@ -711,6 +1270,7 @@
             <span>PLAYER: ALAN</span>
             <div class="hud-right-controls">
                 <span id="hud-exp" class="exp-bar">LVL: 26 [███████░░░] 74%</span>
+                <button id="resume-toggle-btn" class="hud-resume-btn" type="button" onclick="toggleResumeView(true)" title="Open Clean Resume View">📄 RESUME</button>
                 <button id="audio-toggle-btn" class="display-gear-btn" type="button" title="Toggle Audio">🔊</button>
                 <button id="display-gear-btn" class="display-gear-btn" type="button" onclick="openDisplaySettings()" aria-label="Open display settings" title="Display Settings">⚙</button>
             </div>
@@ -721,6 +1281,7 @@
             <button class="nav-btn" onclick="switchTab('projects', this)">> PROJECTS</button>
             <button class="nav-btn" onclick="switchTab('skill_tree', this)">> SKILL_TREE</button>
             <button class="nav-btn" onclick="switchTab('inventory', this)">> INVENTORY</button>
+            <button class="nav-btn resume-nav-btn" onclick="toggleResumeView(true)">> RESUME (CLEAN)</button>
             <button id="cheat-tab-btn" class="nav-btn secret-tab-btn" onclick="switchTab('cheat_codes', this)">> CHEAT_CODES</button>
         </div>
 
@@ -863,6 +1424,206 @@
             </div>
         </div>
     </div>
+
+    <!-- 2.5 CLEAN RESUME VIEW (MODAL / FULL VIEW) -->
+    <section id="clean-resume-view" aria-label="Clean Resume View">
+        <header class="resume-top-bar">
+            <div class="resume-bar-left">
+                <button type="button" class="resume-btn resume-btn-back" onclick="toggleResumeView(false)" title="Return to Arcade OS">
+                    🎮 &lt; ARCADE OS
+                </button>
+            </div>
+            <div class="resume-bar-right">
+                <button type="button" id="resume-copy-email-btn" class="resume-btn" onclick="copyResumeEmail()" title="Copy Email to Clipboard">
+                    📋 Copy Email
+                </button>
+                <button type="button" class="resume-btn resume-btn-primary" onclick="window.print()" title="Print or Save PDF">
+                    🖨️ Print / Save PDF
+                </button>
+                <button type="button" class="resume-btn" onclick="toggleResumeTheme()" title="Toggle Light / Dark View">
+                    🌓 Mode
+                </button>
+                <button type="button" class="resume-btn" onclick="toggleResumeView(false)" aria-label="Close resume view" title="Close">
+                    ✕
+                </button>
+            </div>
+        </header>
+
+        <div class="resume-wrapper">
+            <article class="resume-paper">
+                <header class="resume-header">
+                    <div class="resume-title-row">
+                        <div>
+                            <h1 class="resume-name">Alan Lee</h1>
+                            <div class="resume-role">Solution Architect &amp; Full-Stack Engineer | AI &amp; Automation</div>
+                        </div>
+                    </div>
+                    <div class="resume-contact-bar">
+                        <span class="resume-contact-item">📍 Malaysia (Open to Remote / Relocation)</span>
+                        <a href="mailto:leeleongl7l7@gmail.com" class="resume-contact-item">✉️ leeleongl7l7@gmail.com</a>
+                        <a href="https://wa.me/601112284988" target="_blank" rel="noopener noreferrer" class="resume-contact-item">📱 +60 11-1228 4988</a>
+                        <a href="https://linkedin.com/in/alan-lee-56280725a/" target="_blank" rel="noopener noreferrer" class="resume-contact-item">💼 LinkedIn</a>
+                        <a href="https://github.com/alanl7l7" target="_blank" rel="noopener noreferrer" class="resume-contact-item">💻 GitHub</a>
+                        <a href="https://alanl7l7.github.io/" target="_blank" rel="noopener noreferrer" class="resume-contact-item">🌐 alanl7l7.github.io</a>
+                    </div>
+                </header>
+
+                <section class="resume-section">
+                    <h2 class="resume-section-title">Executive Summary</h2>
+                    <p class="resume-summary-text">
+                        Solution-focused Architect and Full-Stack Engineer specializing in autonomous AI workflows, robust web platforms, and data automation. Proven track record taking products from rapid prototyping to production-grade implementation, integrating modern LLM frameworks (RAG, agent orchestration, OCR pipelines) with low-latency frontend architecture and reliable database systems. Passionate about solving complex problems cleanly and shipping resilient software.
+                    </p>
+                </section>
+
+                <section class="resume-section">
+                    <h2 class="resume-section-title">Core Technical Competencies</h2>
+                    <div class="resume-skills-grid">
+                        <div class="resume-skill-cat">
+                            <div class="resume-skill-label">Languages</div>
+                            <div class="resume-skill-tags">Python, JavaScript (ES6+), SQL, HTML5, CSS3</div>
+                        </div>
+                        <div class="resume-skill-cat">
+                            <div class="resume-skill-label">Frontend Development</div>
+                            <div class="resume-skill-tags">React.js, Custom Hooks, Tailwind CSS, Component Architecture, Responsive Design</div>
+                        </div>
+                        <div class="resume-skill-cat">
+                            <div class="resume-skill-label">Backend &amp; Databases</div>
+                            <div class="resume-skill-tags">PostgreSQL, Supabase, SQLite, MongoDB, ChromaDB (Vector Store), RESTful APIs</div>
+                        </div>
+                        <div class="resume-skill-cat">
+                            <div class="resume-skill-label">AI &amp; Automation</div>
+                            <div class="resume-skill-tags">Agentic AI Architecture, LangChain, RAG Pipelines, OCR Extraction, Browser-use Automation, Gemini API, n8n Workflows</div>
+                        </div>
+                        <div class="resume-skill-cat">
+                            <div class="resume-skill-label">Cloud &amp; DevOps</div>
+                            <div class="resume-skill-tags">Google Cloud Platform (VM, VPC, Cloud Storage), Docker, Git/GitHub, Playwright Stealth, Linux</div>
+                        </div>
+                        <div class="resume-skill-cat">
+                            <div class="resume-skill-label">Specializations</div>
+                            <div class="resume-skill-tags">Web Scraping Systems, Bot Mitigation Bypass, Autonomous Support Agents, Workflow Pipelines</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="resume-section">
+                    <h2 class="resume-section-title">Featured Projects &amp; Engineering Experience</h2>
+
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <h3 class="resume-item-title">TenderVise</h3>
+                            <span class="resume-item-role">Lead Developer / Full-Stack Engineer</span>
+                        </div>
+                        <div class="resume-item-stack">React • Python • Supabase • PostgreSQL</div>
+                        <p class="resume-item-desc">Procurement platform engineered for enterprise workflows and data management.</p>
+                        <ul class="resume-item-bullets">
+                            <li>Architected end-to-end user registration and authentication flow with relational database schema design in Supabase.</li>
+                            <li>Engineered dynamic mock data ingestion pipeline enabling rapid front-end staging and automated integration testing.</li>
+                        </ul>
+                    </div>
+
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <h3 class="resume-item-title">Kenyalang (Duolingo for Malaysia)</h3>
+                            <span class="resume-item-role">AI Systems Architect</span>
+                        </div>
+                        <div class="resume-item-stack">Python • Agentic Frameworks • LangChain • OCR • Vector Search</div>
+                        <p class="resume-item-desc">Intelligent multilingual education platform designed to make Malaysian languages and dialects accessible.</p>
+                        <ul class="resume-item-bullets">
+                            <li>Built OCR document ingestion pipeline to digitize and vectorize non-standard linguistic documents and educational content.</li>
+                            <li>Implemented Retrieval-Augmented Generation (RAG) system with semantic vector search for high-accuracy conversational language tutoring.</li>
+                        </ul>
+                    </div>
+
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <h3 class="resume-item-title">Automated Web Scraping &amp; Autonomous Agent System</h3>
+                            <span class="resume-item-role">Automation Engineer</span>
+                        </div>
+                        <div class="resume-item-stack">Browser-use • Aiden • Python • Multi-Agent Systems</div>
+                        <p class="resume-item-desc">Self-healing browser automation platform that orchestrates autonomous agents for continuous data extraction.</p>
+                        <ul class="resume-item-bullets">
+                            <li>Engineered autonomous agent navigation capable of executing multi-step interactions on complex, dynamic single-page applications.</li>
+                            <li>Integrated anti-bot mitigation bypass techniques and automated task escalation for error-free data harvesting.</li>
+                        </ul>
+                    </div>
+
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <h3 class="resume-item-title">Chat Revamp: UI Unplugged</h3>
+                            <span class="resume-item-role">Frontend Architect</span>
+                        </div>
+                        <div class="resume-item-stack">React • Axios • Custom Hooks • Real-time UI</div>
+                        <p class="resume-item-desc">Refactored enterprise messaging frontend to resolve race conditions and unnecessary re-renders.</p>
+                        <ul class="resume-item-bullets">
+                            <li>Authored clean, decoupled <code>useChat</code> hook separating network communication from presentation layers.</li>
+                            <li>Optimized component rendering cycle, achieving low-latency message streaming and fluid conversational UX.</li>
+                        </ul>
+                    </div>
+
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <h3 class="resume-item-title">Carouselly: Deal Sniper</h3>
+                            <span class="resume-item-role">Backend &amp; Automation Developer</span>
+                        </div>
+                        <div class="resume-item-stack">Python • Playwright Stealth • Telegram Bot API</div>
+                        <p class="resume-item-desc">Real-time marketplace monitoring engine tracking item listings and price drops.</p>
+                        <ul class="resume-item-bullets">
+                            <li>Implemented headless browser workers with stealth fingerprint masking to monitor high-turnover marketplace categories continuously.</li>
+                            <li>Constructed automated notification pipeline broadcasting instant price-filtered alerts to private Telegram subscribers.</li>
+                        </ul>
+                    </div>
+
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <h3 class="resume-item-title">Self-Serve AI HR Portal</h3>
+                            <span class="resume-item-role">Full-Stack / AI Developer</span>
+                        </div>
+                        <div class="resume-item-stack">Streamlit • SQLite • Google Gemini AI</div>
+                        <p class="resume-item-desc">Internal operational portal unifying HR document generation and employee policy assistance.</p>
+                        <ul class="resume-item-bullets">
+                            <li>Engineered automated template-based contract drafting system integrated with Gemini AI for context-aware policy Q&amp;A.</li>
+                            <li>Consolidated disparate internal onboarding workflows into a centralized, easy-to-use interface.</li>
+                        </ul>
+                    </div>
+
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <h3 class="resume-item-title">Autonomous AI WhatsApp Assistant</h3>
+                            <span class="resume-item-role">AI Workflow Developer</span>
+                        </div>
+                        <div class="resume-item-stack">n8n • Gemini API • WhatsApp Cloud API</div>
+                        <p class="resume-item-desc">24/7 intelligent multi-turn support agent handling end-to-end user inquiries.</p>
+                        <ul class="resume-item-bullets">
+                            <li>Configured asynchronous audio processing pipeline transcribing WhatsApp voice notes into structured text queries.</li>
+                            <li>Integrated Gemini API with contextual memory to formulate natural, helpful customer service responses round-the-clock.</li>
+                        </ul>
+                    </div>
+
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <h3 class="resume-item-title">Telegram Paperboy &amp; Social Media Automation</h3>
+                            <span class="resume-item-role">Automation Developer</span>
+                        </div>
+                        <div class="resume-item-stack">n8n • Telegram Bot API • Google Sheets • LinkedIn API</div>
+                        <p class="resume-item-desc">High-signal content aggregation, AI summarization, and scheduled distribution pipelines.</p>
+                        <ul class="resume-item-bullets">
+                            <li>Built ingestion engine filtering live tech RSS and news feeds into condensed actionable summaries for fast consumption.</li>
+                            <li>Constructed scheduled social publishing workflow managing post queues, metadata, and status updates hands-free.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="resume-section">
+                    <h2 class="resume-section-title">Core Strengths &amp; Engineering Mindset</h2>
+                    <ul class="resume-item-bullets">
+                        <li><strong>Solution-First Engineering:</strong> Bias for action; rapid turnaround from concept to functioning MVP, followed by structured refactoring.</li>
+                        <li><strong>Autonomous Agents &amp; Automation:</strong> Practical expertise harmonizing generative AI with deterministic logic and headless browser workflows.</li>
+                        <li><strong>Full-Cycle Delivery:</strong> Comfortable across all layers—database schemas, API design, frontend UX, and cloud deployment.</li>
+                    </ul>
+                </section>
+            </article>
+        </div>
+    </section>
         
       
     <!-- 3. JAVASCRIPT LOGIC -->
@@ -1165,17 +1926,26 @@
             setCmdOutput(`> ${command}`);
 
             if (command === 'help') {
-                setCmdOutput('> Commands: help | ls | cd [dir] | clear | whoami | contact | sudo rm -rf / | theme [name]');
+                setCmdOutput('> Commands: help | ls | cd [dir] | resume | clear | whoami | contact | sudo rm -rf / | theme [name]');
                 return;
             }
 
             if (command === 'ls') {
-                setCmdOutput('> about_me/  projects/  skill_tree/  inventory/  display_settings/');
+                setCmdOutput('> about_me/  projects/  skill_tree/  inventory/  resume/  display_settings/');
+                return;
+            }
+
+            if (command === 'resume' || command === 'cv') {
+                toggleResumeView(true);
                 return;
             }
 
             if (command.startsWith('cd ')) {
                 const target = command.replace('cd ', '').trim();
+                if (target === 'resume' || target === 'cv') {
+                    toggleResumeView(true);
+                    return;
+                }
                 const tabMap = {
                     'about_me': 'about_me', 'projects': 'projects', 'skill_tree': 'skill_tree',
                     'inventory': 'inventory', 'display_settings': 'display_settings', 'cheat_codes': 'cheat_codes'
@@ -1248,7 +2018,76 @@
 
             setCmdOutput('> Unknown command. Type help before improvising.', true);
         }
-        
+
+        function toggleResumeView(show) {
+            play8BitClick();
+            const resumeEl = document.getElementById('clean-resume-view');
+            const mainOs = document.getElementById('main-os');
+            const bootScreen = document.getElementById('boot-screen');
+            if (!resumeEl) return;
+
+            if (show) {
+                resumeEl.classList.add('active');
+                document.body.classList.add('resume-view-open');
+                if (bootScreen) bootScreen.style.display = 'none';
+                if (mainOs) mainOs.style.opacity = '1';
+                window.location.hash = 'resume';
+                setCmdOutput('> Switched to Clean Resume view.');
+            } else {
+                resumeEl.classList.remove('active');
+                document.body.classList.remove('resume-view-open');
+                if (window.location.hash === '#resume') {
+                    history.replaceState(null, null, window.location.pathname + window.location.search);
+                }
+                setCmdOutput('> Returned to Arcade OS.');
+            }
+        }
+
+        function toggleResumeTheme() {
+            play8BitClick();
+            const resumeEl = document.getElementById('clean-resume-view');
+            if (!resumeEl) return;
+            resumeEl.classList.toggle('dark-mode');
+            const isDark = resumeEl.classList.contains('dark-mode');
+            localStorage.setItem('alan_resume_theme', isDark ? 'dark' : 'light');
+        }
+
+        function copyResumeEmail() {
+            play8BitClick();
+            const email = 'leeleongl7l7@gmail.com';
+            const btn = document.getElementById('resume-copy-email-btn');
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(email).then(() => {
+                    if (btn) {
+                        const originalText = btn.innerHTML;
+                        btn.innerHTML = '✓ Copied!';
+                        setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+                    }
+                    setCmdOutput('> Email copied to clipboard: ' + email);
+                }).catch(() => {
+                    fallbackCopyEmail(email, btn);
+                });
+            } else {
+                fallbackCopyEmail(email, btn);
+            }
+        }
+
+        function fallbackCopyEmail(text, btn) {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            if (btn) {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✓ Copied!';
+                setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+            }
+            setCmdOutput('> Email copied to clipboard: ' + text);
+        }
+
         function switchTab(tabId, element) {
             play8BitClick();
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -1283,9 +2122,15 @@
             const cmdInput = document.getElementById('cmd-input');
             const bioSecretTrigger = document.getElementById('bio-secret-trigger');
             const themeButtons = document.querySelectorAll('.theme-btn');
+            const resumeEl = document.getElementById('clean-resume-view');
 
             const savedTheme = localStorage.getItem('alan_display_theme') || 'matrix';
             applyTheme(savedTheme, false);
+
+            const savedResumeTheme = localStorage.getItem('alan_resume_theme');
+            if (savedResumeTheme === 'dark' && resumeEl) {
+                resumeEl.classList.add('dark-mode');
+            }
 
             updateHudExpDisplay();
 
@@ -1312,10 +2157,27 @@
                 });
             }
 
-            // Global typing auto-focuses the terminal
+            // Global typing auto-focuses the terminal (when resume view is not open)
             document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && resumeEl && resumeEl.classList.contains('active')) {
+                    toggleResumeView(false);
+                    return;
+                }
+
+                if (resumeEl && resumeEl.classList.contains('active')) return;
+
                 if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && document.activeElement !== cmdInput) {
                     if (cmdInput) cmdInput.focus();
+                }
+            });
+
+            window.addEventListener('hashchange', () => {
+                if (window.location.hash === '#resume') {
+                    if (!resumeEl.classList.contains('active')) {
+                        toggleResumeView(true);
+                    }
+                } else if (resumeEl && resumeEl.classList.contains('active')) {
+                    toggleResumeView(false);
                 }
             });
 
@@ -1329,6 +2191,15 @@
             });
 
             document.addEventListener('keydown', handleKonamiInput);
+
+            // Direct link to resume bypasses boot screen immediately
+            if (window.location.hash === '#resume' || window.location.search.includes('resume')) {
+                sessionStorage.setItem('alan_portfolio_booted', 'true');
+                if (bootScreen) bootScreen.style.display = 'none';
+                if (mainOs) mainOs.style.opacity = '1';
+                toggleResumeView(true);
+                return;
+            }
 
             // Skip if already loaded this session
             if (sessionStorage.getItem('alan_portfolio_booted') === 'true') {
